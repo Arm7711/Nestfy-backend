@@ -5,6 +5,7 @@ node_modules/
 # dotenv environment variables file
 .env
 .env.test
+src/certificates
 # Logs
 logs
 *.log
