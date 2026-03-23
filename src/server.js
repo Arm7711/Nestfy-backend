@@ -4,6 +4,8 @@ import sequelize from './config/db.sequelize.js';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import './models/index.js';
+import authRoutes from './router/auth.routes.js';
+
 
 
 const app = express();
@@ -19,6 +21,8 @@ app.use(cors({
 
 const port = process.env.PORT || 3000;
 
+app.use('/api/auth', authRoutes);
+
 async function initDatabase() {
     try {
         console.log('Connecting to DB...');
@@ -26,7 +30,7 @@ async function initDatabase() {
         console.log('✅ Database connected');
 
         console.log('Syncing tables...');
-        await sequelize.sync({ alter: false });
+        await sequelize.sync({ alter: true });
         console.log('✅ All tables synced');
 
     } catch (err) {
