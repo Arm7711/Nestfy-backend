@@ -30,23 +30,23 @@ User.init(
             type: DataTypes.STRING,
             allowNull: false,
             validate: {
-                notEmpty: { msg: 'Անունը պարտադիր է' },
-                len: { args: [2, 50], msg: 'Անունը պետք է լինի 2-50 նիշ' },
+                notEmpty: { msg: 'Name is required' },
+                len: { args: [2, 50], msg: 'Name must be between 2 and 50 characters' },
             },
         },
         email: {
             type: DataTypes.STRING,
             allowNull: false,
-            unique: { msg: 'Այս email-ը արդեն գրանցված է' },
+            unique: { msg: 'This email is already registered' },
             validate: {
-                isEmail: { msg: 'Email-ը ճիշտ չէ' },
+                isEmail: { msg: 'Email is invalid' },
             },
         },
         password: {
             type: DataTypes.STRING,
             allowNull: true,
             validate: {
-                len: { args: [8, 100], msg: 'Գաղտնաբառը պետք է լինի min 8 նիշ' },
+                len: { args: [8, 100], msg: 'Password must be at least 8 characters' },
             },
         },
         role: {
