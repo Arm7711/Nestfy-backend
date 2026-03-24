@@ -62,6 +62,11 @@ User.init(
             type: DataTypes.BOOLEAN,
             defaultValue: true,
         },
+
+        provider: {
+            type: DataTypes.ENUM('email', 'google', 'apple'),
+            defaultValue: 'email',
+        },
     },
     {
         sequelize,
