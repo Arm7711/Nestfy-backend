@@ -1,8 +1,6 @@
 import Agent from "../models/Agent.js";
 import User from "../models/User.js";
 import {registerAgentSchema} from "../validator/agent.validator.js";
-import {agent} from "supertest";
-
 
 export const registerAgent = async (req, res) => {
     try {
@@ -25,14 +23,33 @@ export const registerAgent = async (req, res) => {
         });
 
         if (existing) {
-            return res.status(409).json({
-                success: false,
-                message: existing.status === 'pending'
-                    ? 'Your request has already been sent — awaiting admin approval.'
-                    : existing.status === 'approved'
-                        ? 'You already agent'
-                        : 'Your application has been rejected — please contact support.'
+            if(existing.status === 'rejected') {
+                await existing.destroy()
+            }else {
+                return res.status(409).json({
+                    success: false,
+                    message: existing.status === 'pending'
+                        ? 'Your request has already been sent — awaiting admin approval.'
+                        : existing.status === 'approved'
+                            ? 'You already agent'
+                            : 'Your application has been rejected — please contact support.'
+                });
+            }
+        }
+
+        if (req.body.licenseNumber) {
+            const existingLicense = await Agent.findOne({
+                where: {
+                    licenseNumber: req.body.licenseNumber,
+                    status: 'approved'
+                }
             });
+            if (existingLicense) {
+                return res.status(409).json({
+                    success: false,
+                    message: 'License number already in use by another approved agent.'
+                });
+            }
         }
 
         const agent = await Agent.create({
@@ -40,7 +57,7 @@ export const registerAgent = async (req, res) => {
             phone: req.body.phone,
             bio: req.body.bio,
             city: req.body.city,
-            experience: req.body.experience || 0,
+            experience: req.body.experience !== null ? req.body.experience : 0,
             licenseNumber: req.body.licenseNumber,
             facebook: req.body.facebook,
             instagram: req.body.instagram,
@@ -135,6 +152,8 @@ export const approveAgent = async (req, res) => {
             isVerified: true,
         })
 
+        await User.update({ role: 'agent' }, { where: { id: agent.userId } });
+
         res.json({
             success: true,
             message: "The agent has been confirmed, the user role has been changed to agent."
@@ -148,6 +167,10 @@ export const rejectAgent = async (req, res) => {
     try {
         const { reason } = req.body;
 
+        const agent = await Agent.findByPk(req.params.id);
+        if(!agent){
+            return res.status(404).json({ success: false, message: 'Agent not found' });
+        }
         if(!reason) {
             return res.status(400).json({
                 success: false,
@@ -159,7 +182,6 @@ export const rejectAgent = async (req, res) => {
             status: 'rejected',
             rejectionReason: reason
         })
-
 
         res.json({
             success: true,

@@ -10,11 +10,12 @@ import { verifyToken, requireRole } from '../middleware/auth.middleware.js';
 
 const router = Router();
 
+router.get('/me', verifyToken, requireRole('agent'), getMyAgentProfile);
+
 router.get('/:id', getAgentById);
 
 router.post('/register', verifyToken, registerAgent);
 
-router.get('/me', verifyToken, requireRole('agent'), getMyAgentProfile);
 
 router.patch(
     '/:id/approve',

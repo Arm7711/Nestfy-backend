@@ -208,7 +208,7 @@ export const refreshToken = async (req, res) => {
         if (!token) {
             return res.status(401).json({
                 success: false,
-                message: 'Refresh token չкa',
+                message: 'Refresh token is missing',
             });
         }
 
@@ -239,7 +239,7 @@ export const refreshToken = async (req, res) => {
     } catch (err) {
         res.status(401).json({
             success: false,
-            message: 'Token-ը invalid',
+            message: 'Token is invalid',
         });
     }
 };

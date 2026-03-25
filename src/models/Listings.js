@@ -1,5 +1,6 @@
 import { DataTypes, Model } from 'sequelize';
 import sequelize from '../config/db.sequelize.js';
+import Agent from "./Agent.js";
 
 class Listing extends Model {}
 
@@ -32,5 +33,8 @@ Listing.init({
 }, {
     sequelize, modelName: 'Listing', tableName: 'listings', timestamps: true,
 });
+
+Listing.belongsTo(Agent, { foreignKey: 'agentId', as: 'agent' });
+Agent.hasMany(Listing, { foreignKey: 'agentId', as: 'listings' });
 
 export default Listing;
