@@ -1,5 +1,7 @@
 import {DataTypes, Model} from 'sequelize';
 import sequelize from '../config/db.sequelize.js';
+import Agent from "./Agent.js";
+import Listing from "./Listings.js";
 
 class ListingImage extends Model {
 }
@@ -19,5 +21,8 @@ ListingImage.init({
 }, {
     sequelize, modelName: 'ListingImage', tableName: 'listing_images', timestamps: false,
 });
+
+ListingImage.belongsTo(Listing, { foreignKey: 'agentId', as: 'agent' });
+Listing.hasMany(ListingImage, { foreignKey: 'agentId', as: 'listings' });
 
 export default ListingImage;

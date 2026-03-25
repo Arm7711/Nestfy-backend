@@ -1,4 +1,6 @@
 import { Router } from 'express';
+import rateLimit from 'express-rate-limit';
+
 import {
     register,
     login,
@@ -12,19 +14,23 @@ import { verifyToken } from '../middleware/auth.middleware.js';
 
 const router = Router();
 
+const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 10,
+    message: { success: false, message: 'Too many attempts' },
+});
 
-router.post('/register',  register);
-router.post('/login',     login);
-
-
-router.post('/google',    googleLogin);
-router.post('/apple',     appleLogin);
-
-
-router.post('/refresh',   refreshToken);
-router.post('/logout',    logout);
+const limiter = (req, res, next) => authLimiter(req, res, next);
 
 
-router.get('/me',         verifyToken, getMe);
+router.post('/login', limiter, login);
+router.post('/register', limiter, register);
+router.post('/google', limiter, googleLogin);
+router.post('/apple', limiter, appleLogin);
+
+router.post('/refresh', refreshToken);
+router.post('/logout', logout);
+
+router.get('/me', verifyToken, getMe);
 
 export default router;

@@ -35,7 +35,7 @@ export const getListings = async (req, res) => {
             status: 'active',
         }
 
-        if (city) where.city = {[Op.like]: `%{city}%`};
+        if (city) where.city = {[Op.like]: `%${city}%`};
         if (type) where.type = type;
         if (category) where.category = category;
         if (rooms) where.rooms = parseInt(rooms);
@@ -128,6 +128,7 @@ export const getListingById = async (req, res) => {
                 {
                     model: ListingImage,
                     as: 'images',
+                    separate: true,
                     order: ['orderIndex', 'ASC'],
                 },
             ],
@@ -168,11 +169,10 @@ export const createListing = async (req, res) => {
             })
         }
 
-        const agent = await ListingImage.findOne({
-            where: {
-                userId: req.user.id,
-            }
-        })
+        const agent = await Agent.findOne({
+            where: { userId: req.user.id }
+        });
+
         if (!agent) {
             return res.status(400).json({
                 success: false,
@@ -188,10 +188,10 @@ export const createListing = async (req, res) => {
         }
 
         const PLAN_LIMITS = {basic: 5, pro: 20, premium: Infinity};
-        if (agent.totalListings >= PLAN_LIMITS[agent.plan]) {
+        if (PLAN_LIMITS[agent.plan] !== Infinity && agent.totalListings >= PLAN_LIMITS[agent.plan]) {
             return res.status(403).json({
                 success: false,
-                message: `Your ${agent.plan} plan allows ${PLAN_LIMITS[agent.plan]} listing`
+                message: `Your ${agent.plan} plan allows ${PLAN_LIMITS[agent.plan]} listings`
             });
         }
 
