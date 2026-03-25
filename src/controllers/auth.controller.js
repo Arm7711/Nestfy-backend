@@ -1,43 +1,22 @@
 import jwt from 'jsonwebtoken';
 import {registerSchema, loginSchema} from "../validator/auth.validator.js";
 import User from "../models/User.js";
-import dotenv from 'dotenv';
+import 'dotenv/config';
+import appleSignIn from 'apple-signin-auth';
+import { OAuth2Client } from 'google-auth-library';
 import redis from "../config/redis.js";
-dotenv.config();
+import {
+    generateAccessToken,
+    generateRefreshToken,
+    saveRefreshToken,
+    setRefreshCookie}
+    from "../utils/auth.utils.js";
 
-const generateAccessToken = (user) => {
-    return jwt.sign(
-        {id: user.id, role: user.role},
-        process.env.JWT_ACCESS_SECRET,
-        {expiresIn: process.env.JWT_ACCESS_EXPIRES }
-    );
-};
-
-const generateRefreshToken = (user) => {
-    return jwt.sign(
-        { id: user.id },
-        process.env.JWT_REFRESH_SECRET,
-        {expiresIn: process.env.JWT_REFRESH_EXPIRES }
-    );
-};
-
-const saveRefreshToken = async (userId, refreshToken) => {
-    await redis.setex(`refresh:${userId}`, 604800, refreshToken)
-};
-
-const setRefreshCookie = (res, token) => {
-    res.cookie('refreshToken', token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
-        maxAge: 7 * 24 * 60 * 60 * 1000
-    });
-};
-
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 export const register = async (req, res) => {
     try {
-        const { error } = loginSchema.validate(req.body, { abortEarly: false, allowUnknown: true });
+        const { error } = registerSchema.validate(req.body, { abortEarly: false, allowUnknown: true });
 
         if (error) {
             const messages = error.details.map(d => d.message);
@@ -71,7 +50,7 @@ export const register = async (req, res) => {
 
         res.status(201).json({
             success: true,
-            message: 'Հաջողությամբ գրանցվեցիր',
+            message: 'Registration Successfully',
             accessToken,
             user: {
                 id: user.id,
@@ -145,13 +124,91 @@ export const login = async (req, res) => {
     }
 }
 
+
+export const googleLogin = async (req, res) => {
+    try {
+        const { idToken } = req.body;
+        if (!idToken) return res.status(400).json({ success: false, message: 'Google ID token missing' });
+
+        const ticket = await client.verifyIdToken({
+            idToken,
+            audience: process.env.GOOGLE_CLIENT_ID,
+        });
+
+        const payload = ticket.getPayload();
+        const { sub: googleId, email, name, picture: avatar } = payload;
+
+        if (!email) return res.status(400).json({ success: false, message: 'Email not available from Google' });
+
+        let user = await User.findOne({ where: { email } });
+
+        if (!user) {
+            user = await User.create({ name, email, avatar, provider: 'google', googleId });
+        } else if (!user.googleId) {
+            user.googleId = googleId;
+            user.provider = 'google';
+            await user.save();
+        }
+
+        const accessToken = generateAccessToken(user);
+        const refreshToken = generateRefreshToken(user);
+
+        await saveRefreshToken(user.id, refreshToken);
+        setRefreshCookie(res, refreshToken);
+
+        res.json({ success: true, accessToken, user: user.toJSON() });
+
+    } catch (err) {
+        res.status(500).json({ success: false, message: 'Google login failed', error: err.message });
+    }
+};
+
+export const appleLogin = async (req, res) => {
+    try {
+        const { identityToken } = req.body;
+        if (!identityToken) return res.status(400).json({ success: false, message: 'Apple identity token missing' });
+
+        const appleData = await appleSignIn.verifyIdToken(identityToken, {
+            audience: process.env.APPLE_CLIENT_ID,
+            ignoreExpiration: false,
+        });
+
+        const { sub: appleId, email } = appleData;
+        if (!email) return res.status(400).json({ success: false, message: 'Apple email missing' });
+
+        let user = await User.findOne({ where: { email } });
+
+        const displayName = req.body.name || 'Apple User';
+
+        if (!user) {
+            user = await User.create({ name: displayName, email, provider: 'apple', appleId });
+        } else if (!user.appleId) {
+            user.appleId = appleId;
+            user.provider = 'apple';
+            if (req.body.name) user.name = req.body.name;
+            await user.save();
+        }
+
+        const accessToken = generateAccessToken(user);
+        const refreshToken = generateRefreshToken(user);
+
+        await saveRefreshToken(user.id, refreshToken);
+        setRefreshCookie(res, refreshToken);
+
+        res.json({ success: true, accessToken, user: user.toJSON() });
+
+    } catch (err) {
+        res.status(500).json({ success: false, message: 'Apple login failed', error: err.message });
+    }
+};
+
 export const refreshToken = async (req, res) => {
     try {
         const token = req.cookies.refreshToken;
         if (!token) {
             return res.status(401).json({
                 success: false,
-                message: 'Refresh token չкa',
+                message: 'Refresh token is missing',
             });
         }
 
@@ -169,7 +226,7 @@ export const refreshToken = async (req, res) => {
         if (!user || !user.isActive) {
             return res.status(401).json({
                 success: false,
-                message: 'User-ы not found',
+                message: 'User not found',
             });
         }
 
@@ -182,7 +239,7 @@ export const refreshToken = async (req, res) => {
     } catch (err) {
         res.status(401).json({
             success: false,
-            message: 'Token-ը invalid',
+            message: 'Token is invalid',
         });
     }
 };
