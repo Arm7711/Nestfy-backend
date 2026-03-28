@@ -1,13 +1,11 @@
-import User from "./User.js";
-import Agent from "./Agent.js";
-import Listing from "./Listings.js";
-import ListingImage from "./ListingImage.js";
+// models/index.js
+import sequelize from '../config/db.sequelize.js';
+import User from './User.js';
+import Session from './Session.js';
+import AuthCode from './AuthCode.js';
 
+User.hasMany(Session, { foreignKey: 'userId', as: 'sessions', onDelete: 'CASCADE' });
+Session.belongsTo(User, { foreignKey: 'userId', as: 'user' });
 
-export default {
-    User: User,
-    Agent: Agent,
-    Listing: Listing,
-    ListingImage: ListingImage,
-
-}
+export { sequelize, User, Session, AuthCode };
+export default sequelize;

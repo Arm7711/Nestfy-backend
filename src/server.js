@@ -1,53 +1,62 @@
 import express from 'express';
-import 'dotenv/config';
-import sequelize from './config/db.sequelize.js';
-import cookieParser from 'cookie-parser';
+import helmet from 'helmet';
 import cors from 'cors';
-import './models/index.js';
-import authRoutes from './router/auth.routes.js';
-import listingRoutes from "./router/listing.routes.js";
-import agentRoutes from "./router/agent.routes.js";
+import cookieParser from 'cookie-parser';
+import 'dotenv/config';
 
+import {validateEnv} from './config/env.js';
+
+validateEnv();
+
+import {globalLimiter} from './middleware/rate.limitter.js';
+import {errorHandler, notFoundHandler} from './middleware/errorHandler.middleware.js';
+import authRoutes from './routes/auth.routes.js';
+import {sequelize} from './models/index.js';
 
 const app = express();
-app.use(express.json());
+
+app.use(helmet());
+
+app.use(
+    cors({
+        origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
+        credentials: true,
+    })
+);
+
+app.set('trust proxy', 1);
+
+app.use(express.json({limit: '10kb'}));
+app.use(express.urlencoded({extended: false, limit: '10kb'}));
 app.use(cookieParser());
 
-app.use(cors({
-    origin: '*',
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    credentials: true
-}));
-
-
-const port = process.env.PORT || 3000;
+app.use(globalLimiter);
 
 app.use('/api/auth', authRoutes);
-app.use('/api/listings', listingRoutes);
-app.use('/api/agents', agentRoutes);
 
+app.use(notFoundHandler);
+app.use(errorHandler);
 
-async function initDatabase() {
+const PORT = Number(process.env.PORT) || 3000;
+
+const start = async () => {
     try {
-        console.log('Connecting to DB...');
         await sequelize.authenticate();
-        console.log('✅ Database connected');
+        console.log('[DB] Connection established.');
 
-        console.log('Syncing tables...');
-        await sequelize.sync({ alter: true });
-        console.log('✅ All tables synced');
 
+        if (process.env.NODE_ENV === 'development') {
+            await sequelize.sync({alter: true});
+            console.log('[DB] Schema synced.');
+        }
+
+        app.listen(PORT, () => console.log(`[Server] Running on port ${PORT}`));
     } catch (err) {
-        console.error('❌ Database init failed:', err);
+        console.error('[Server] Failed to start:', err);
         process.exit(1);
     }
-}
+};
 
+start();
 
-
-(async () => {
-    await initDatabase();
-    app.listen(port, () => {
-        console.log(`Server running on http://localhost:${port}`);
-    });
-})();
+export default app;
