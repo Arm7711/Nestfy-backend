@@ -1,5 +1,5 @@
 import { Sequelize } from 'sequelize';
-
+import 'dotenv/config';
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -12,7 +12,7 @@ const caPath = path.join(__dirname, '../certificates/ca.pem');
 const {
     DB_HOST,
     DB_NAME,
-    DB_PASSWORD,
+    DB_PASS,
     DB_USER,
     DB_PORT
 } = process.env;
@@ -22,7 +22,7 @@ const {
 const sequelize = new Sequelize(
     DB_NAME,
     DB_USER,
-    DB_PASSWORD,
+    DB_PASS,
     {
         host: DB_HOST,
         port: DB_PORT,
@@ -31,7 +31,7 @@ const sequelize = new Sequelize(
         dialectOptions: {
             ssl: {
                 ca: await fs.readFile(caPath),
-                rejectUnauthorized: true
+                rejectUnauthorized: false
             }
         }
     }

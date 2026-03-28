@@ -3,13 +3,9 @@ import bcrypt from 'bcryptjs';
 import sequelize from '../config/db.sequelize.js';
 
 class User extends Model {
-
-    static async hashPassword(password) {
-        return await bcrypt.hash(password, 10);
-    }
-
-    async comparePassword(candidatePassword) {
-        return await bcrypt.compare(candidatePassword, this.password);
+    async comparePassword(candidate) {
+        if (!this.password) return false;
+        return bcrypt.compare(candidate, this.password);
     }
 
     toJSON() {
@@ -22,39 +18,37 @@ class User extends Model {
 User.init(
     {
         id: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.UUID,
+            defaultValue: DataTypes.UUIDV4,
             primaryKey: true,
-            autoIncrement: true,
         },
         name: {
-            type: DataTypes.STRING,
+            type: DataTypes.STRING(100),
             allowNull: false,
             validate: {
-                notEmpty: { msg: 'Name is required' },
-                len: { args: [2, 50], msg: 'Name must be between 2 and 50 characters' },
+                notEmpty: { msg: 'Name is required.' },
+                len: { args: [2, 100], msg: 'Name must be 2–100 characters.' },
             },
         },
         email: {
-            type: DataTypes.STRING,
+            type: DataTypes.STRING(255),
             allowNull: false,
-            unique: { msg: 'This email is already registered' },
-            validate: {
-                isEmail: { msg: 'Email is invalid' },
+            unique: true,
+            validate: { isEmail: { msg: 'Invalid email address.' } },
+            set(val) {
+                this.setDataValue('email', val.toLowerCase().trim());
             },
         },
         password: {
-            type: DataTypes.STRING,
+            type: DataTypes.STRING(255),
             allowNull: true,
-            validate: {
-                len: { args: [8, 100], msg: 'Password must be at least 8 characters' },
-            },
         },
         role: {
             type: DataTypes.ENUM('user', 'agent', 'admin', 'superadmin'),
             defaultValue: 'user',
         },
         avatar: {
-            type: DataTypes.STRING,
+            type: DataTypes.STRING(500),
             allowNull: true,
             defaultValue: null,
         },
@@ -62,21 +56,10 @@ User.init(
             type: DataTypes.BOOLEAN,
             defaultValue: true,
         },
-
-        provider: {
-            type: DataTypes.ENUM('email', 'google', 'apple'),
-            defaultValue: 'email',
-        },
-
-        googleId: {
-            type: DataTypes.STRING,
+        emailVerifiedAt: {
+            type: DataTypes.DATE,
             allowNull: true,
-            unique: true,
-        },
-        appleId: {
-            type: DataTypes.STRING,
-            allowNull: true,
-            unique: true,
+            defaultValue: null,
         },
     },
     {
@@ -84,15 +67,19 @@ User.init(
         modelName: 'User',
         tableName: 'users',
         timestamps: true,
+        indexes: [
+            { unique: true, fields: ['email'] },
+            { fields: ['isActive'] },
+        ],
         hooks: {
             beforeCreate: async (user) => {
                 if (user.password) {
-                    user.password = await User.hashPassword(user.password);
+                    user.password = await bcrypt.hash(user.password, 12);
                 }
             },
             beforeUpdate: async (user) => {
                 if (user.changed('password') && user.password) {
-                    user.password = await User.hashPassword(user.password);
+                    user.password = await bcrypt.hash(user.password, 12);
                 }
             },
         },

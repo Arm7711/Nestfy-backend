@@ -1,6 +1,6 @@
 import slugify from "slugify";
 import {Op} from "sequelize";
-import {clearListingsCache, getCache, setCache} from "../cervices/cache.service.js";
+import {clearListingsCache, getCache, setCache} from "../services/cache.service.js";
 import Listings from "../models/Listings.js";
 import Agent from "../models/Agent.js";
 import User from "../models/User.js";
