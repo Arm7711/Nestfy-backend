@@ -1,46 +1,44 @@
-import jwt from 'jsonwebtoken';
-import User  from '../models/User.js';
+import { verifyAccessToken } from '../services/token.service.js';
+import * as userRepo from '../repositories/user.repo.js';
+import AppError from '../utils/AppError.js';
 
 export const verifyToken = async (req, res, next) => {
     try {
         const authHeader = req.headers.authorization;
         if (!authHeader?.startsWith('Bearer ')) {
-            return res.status(401).json({
-                success: false,
-                message: 'Unauthorized',
-            });
+            throw new AppError('Access token required.', 401, 'NO_TOKEN');
         }
 
-        const token = authHeader.split(' ')[1];
+        const token   = authHeader.slice(7);
+        const decoded = verifyAccessToken(token);
 
-        const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
-
-        const user = await User.findByPk(decoded.id);
+        const user = await userRepo.findById(decoded.sub);
         if (!user || !user.isActive) {
-            return res.status(401).json({
-                success: false,
-                message: 'User not found',
-            });
+            throw new AppError('Account not found or suspended.', 401, 'INVALID_USER');
         }
 
-        req.user = user;
+        req.user         = user;
+        req.tokenPayload = decoded;
         next();
     } catch (err) {
-        return res.status(401).json({
-            success: false,
-            message: 'Token invalid or expired',
-        });
+        if (err.isOperational) return next(err);
+        next(new AppError('Token invalid or expired.', 401, 'INVALID_TOKEN'));
     }
 };
 
-export const requireRole = (...roles) => {
-    return (req, res, next) => {
-        if (!roles.includes(req.user.role)) {
-            return res.status(403).json({
-                success: false,
-                message: 'access is denied',
-            });
-        }
-        next();
-    };
+export const requireRole = (...roles) => (req, res, next) => {
+    if (!req.user) {
+        return next(new AppError('Unauthorized.', 401, 'UNAUTHORIZED'));
+    }
+    if (!roles.includes(req.user.role)) {
+        return next(new AppError('Insufficient permissions.', 403, 'FORBIDDEN'));
+    }
+    next();
+};
+
+export const requireVerifiedEmail = (req, res, next) => {
+    if (!req.user?.emailVerifiedAt) {
+        return next(new AppError('Email verification is required.', 403, 'EMAIL_NOT_VERIFIED'));
+    }
+    next();
 };

@@ -26,7 +26,7 @@ Agent.init(
             type: DataTypes.STRING(20),
             allowNull: false,
             validate: {
-                notEmpty: { msg: 'Հեռախոսը պարտադիր է' },
+                notEmpty: { msg: 'Phone number is required' },
             },
         },
         bio: {
@@ -49,7 +49,7 @@ Agent.init(
             unique: true,
         },
         licenseFile: {
-            type: DataTypes.STRING, // Cloudinary URL
+            type: DataTypes.STRING,
             allowNull: true,
         },
         isVerified: {
