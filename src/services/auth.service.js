@@ -92,7 +92,7 @@ export const verifyCode = async ({email, code, userAgent, ip}) => {
         throw new AppError('This account has been suspended.', 403, 'ACCOUNT_SUSPENDED');
     }
 
- 
+
     if (!user.emailVerifiedAt) {
         await user.update({emailVerifiedAt: new Date()});
         await user.reload();
