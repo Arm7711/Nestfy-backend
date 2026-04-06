@@ -13,10 +13,11 @@ router.post('/login',        authLimiter, validate(initiateSchema),    ctrl.init
 router.post('/register',     authLimiter, validate(initiateSchema),    ctrl.initiateRegister);
 
 
-router.post('/verify-code',  authLimiter, validate(verifyCodeSchema),  ctrl.verifyCode);
+router.post('/verify-code',  authLimiter, validate(verifyCodeSchema),  ctrl.verifyCodeController);
 
 
 router.post('/refresh',                                                 ctrl.refresh);
+router.post('/access-token',                           ctrl.getAccessTokenController);
 router.post('/logout',                                                  ctrl.logout);
 router.post('/logout-all',   verifyToken,                              ctrl.logoutAll);
 
