@@ -41,17 +41,28 @@ export const initiateRegister = asyncHandler(async (req, res) => {
     res.status(201).json({ success: true, ...result });
 });
 
-export const verifyCode = asyncHandler(async (req, res) => {
-    const { accessToken, refreshToken, user } = await authSvc.verifyCode({
-        ...req.body,
+export const getAccessTokenController = asyncHandler(async (req, res) => {
+    const refreshToken = getRefreshCookie(req);
+    if (!refreshToken) return res.status(401).json({ success: false, message: 'No refresh token' });
+
+    const { accessToken } = await authSvc.refreshAccessToken(refreshToken, req.headers['user-agent'], req.ip);
+
+    res.json({ success: true, accessToken });
+});
+
+export const verifyCodeController = asyncHandler(async (req, res) => {
+    const { email, code } = req.body;
+
+    const { refreshToken, user } = await authSvc.verifyCodeForCookie({
+        email, code,
         userAgent: req.headers['user-agent'],
-        ip:        req.ip,
+        ip: req.ip
     });
 
     setRefreshCookie(res, refreshToken);
-    res.json({ success: true, accessToken, user });
-});
 
+    res.json({ success: true, user });
+});
 
 export const refresh = asyncHandler(async (req, res) => {
     const token = getRefreshCookie(req);

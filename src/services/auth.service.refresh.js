@@ -52,6 +52,8 @@ export const refresh = async ({ refreshToken, userAgent, ip }) => {
     };
 };
 
+
+
 export const logout = async ({ refreshToken }) => {
     if (!refreshToken) return;
     try {
