@@ -64,19 +64,25 @@ export const verifyCodeForCookie = async ({ email, code, userAgent, ip }) => {
 
     if (!result.success) {
         const MESSAGES = {
-            INVALID_CODE: 'Invalid or expired code.',
-            CODE_EXPIRED: 'This code has expired. Please request a new one.',
+            INVALID_CODE:      'Invalid or expired code.',
+            CODE_EXPIRED:      'This code has expired. Please request a new one.',
             TOO_MANY_ATTEMPTS: 'Too many failed attempts. Please request a new code.',
         };
         const STATUS = { INVALID_CODE: 400, CODE_EXPIRED: 400, TOO_MANY_ATTEMPTS: 429 };
-        const err = new AppError(MESSAGES[result.error] ?? 'Verification failed.', STATUS[result.error] ?? 400, result.error);
-        if (result.remainingAttempts !== undefined) err.remainingAttempts = result.remainingAttempts;
+        const err = new AppError(
+            MESSAGES[result.error] ?? 'Verification failed.',
+            STATUS[result.error]   ?? 400,
+            result.error
+        );
+        if (result.remainingAttempts !== undefined) {
+            err.remainingAttempts = result.remainingAttempts;
+        }
         throw err;
     }
 
     const user = await userRepo.findByEmail(normalized);
-    if (!user) throw new AppError('User not found.', 404, 'USER_NOT_FOUND');
-    if (!user.isActive) throw new AppError('Account suspended.', 403, 'ACCOUNT_SUSPENDED');
+    if (!user)          throw new AppError('User not found.',     404, 'USER_NOT_FOUND');
+    if (!user.isActive) throw new AppError('Account suspended.',  403, 'ACCOUNT_SUSPENDED');
 
     if (!user.emailVerifiedAt) {
         await user.update({ emailVerifiedAt: new Date() });
@@ -87,7 +93,7 @@ export const verifyCodeForCookie = async ({ email, code, userAgent, ip }) => {
 
     return {
         refreshToken: rawToken,
-        user: formatUser(user)
+        user: formatUser(user),
     };
 };
 
