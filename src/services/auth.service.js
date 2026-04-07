@@ -99,15 +99,6 @@ export const verifyCodeForCookie = async ({ email, code, userAgent, ip }) => {
 
 export {refresh, logout, logoutAll} from './auth.service.refresh.js';
 
-export const refreshAccessToken = async (refreshToken, userAgent, ip) => {
-    if (!refreshToken) throw new AppError('No refresh token', 401);
-
-    const { accessToken, refreshToken: newRefreshToken, user } = await refresh({ refreshToken, userAgent, ip });
-
-    return { accessToken, refreshToken: newRefreshToken, user };
-};
-
-
 export const oauthLogin = async ({provider, providerId, email, name, userAgent, ip}) => {
     let oauthAccount = await OAuthAccount.findOne({
         where: {provider, providerId},
