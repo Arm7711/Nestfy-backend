@@ -1,4 +1,7 @@
 import User from '../models/User.js';
+import {UserProfile} from "../models/index.js";
+import Agent from "../models/Agent.js";
+import Agency from "../models/Agency.js";
 
 export const findByEmail = (email) =>
     User.findOne({ where: { email: email.toLowerCase().trim() } });
@@ -11,3 +14,49 @@ export const createUser = (data) => User.create(data);
 
 export const updateUser = (id, data) =>
     User.update(data, { where: { id } });
+
+export const findByWithProfile = (id) =>
+    User.findByPk(id, {
+        attributes: [
+            'id', 'name', 'email', 'role',
+            'avatar', 'isActive', 'emailVerifiedAt', 'createdAt',
+        ],
+
+        include: [
+            {
+                model: UserProfile,
+                as: 'profile',
+                required: false,
+                attributes: [
+                    'id', 'displayName', 'phone', 'bio',
+                    'country', 'city', 'state',
+                    'phoneVerifiedAt', 'govIdVerifiedAt',
+                    'specializations', 'yearsOfExperience', 'languages',
+                    'coverPhoto', 'introVideo', 'portfolioImages',
+                    'workingHours', 'responseTime', 'preferredContact', 'isAvailable',
+                    'facebook', 'instagram', 'telegram', 'linkedin', 'website',
+                    'totalReviews', 'averageRating', 'profileViews', 'responseRate',
+                ],
+            },
+            {
+                model: Agent,
+                as: 'agent',
+                required: false,
+                attributes: [
+                    'id', 'status', 'isVerified', 'plan',
+                    'planExpiresAt', 'licenseNumber',
+                    'totalListings', 'totalViews',
+                    'rating', 'reviewsCount',
+                ],
+            },
+            {
+                model: Agency,
+                as: 'agency',
+                required: false,
+                attributes: [
+                    'id', 'name', 'status', 'isVerified',
+                    'totalListings', 'totalViews',
+                ],
+            },
+        ],
+    });

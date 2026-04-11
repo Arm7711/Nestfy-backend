@@ -1,6 +1,5 @@
 import {DataTypes, Model} from 'sequelize';
 import sequelize from '../config/db.sequelize.js';
-import Agent from "./Agent.js";
 import Listing from "./Listings.js";
 
 class ListingImage extends Model {

@@ -1,7 +1,8 @@
 import * as authSvc from '../services/auth.service.js';
 import asyncHandler from '../utils/asyncHandler.js';
 import {verifyFacebookToken, verifyGoogleToken} from "../services/oauth.serivice.js";
-
+import {formatUserFull} from "../utils/formatters.js";
+import {findByWithProfile} from '../repositories/user.repo.js';
 const IS_PROD     = process.env.NODE_ENV === 'production';
 const COOKIE_NAME = IS_PROD ? '__Host-refresh' : 'refreshToken';
 
@@ -93,18 +94,19 @@ export const logoutAll = asyncHandler(async (req, res) => {
 
 
 export const getMe = asyncHandler(async (req, res) => {
-    const u = req.user;
+    const user = await findByWithProfile(req.user.id);
+
+    if (!user) {
+        return res.status(404).json({
+            success: false,
+            message: 'User not found.',
+            code:    'USER_NOT_FOUND',
+        });
+    }
+
     res.json({
         success: true,
-        user: {
-            id:              u.id,
-            name:            u.name,
-            email:           u.email,
-            role:            u.role,
-            avatar:          u.avatar,
-            emailVerifiedAt: u.emailVerifiedAt,
-            createdAt:       u.createdAt,
-        },
+        user:    formatUserFull(user),
     });
 });
 

@@ -12,7 +12,7 @@ Agency.init(
             autoIncrement: true,
         },
         userId: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.UUID,
             allowNull: false,
             unique: true,
             references: {

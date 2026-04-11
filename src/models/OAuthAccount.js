@@ -15,7 +15,7 @@ OAuthAccount.init(
             allowNull: false,
         },
         provider: {
-            type: DataTypes.ENUM('google', 'apple'),
+            type: DataTypes.ENUM('google', 'facebook'),
             allowNull: false,
         },
         providerId: {

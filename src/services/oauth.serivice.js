@@ -1,5 +1,4 @@
 import { OAuth2Client } from "google-auth-library";
-import appleSignIn from 'apple-signin-auth';
 import AppError from "../utils/AppError.js";
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
