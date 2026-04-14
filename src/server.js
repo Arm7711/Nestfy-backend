@@ -4,14 +4,14 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import 'dotenv/config';
 
-import {validateEnv} from './config/env.js';
+import { validateEnv } from './config/env.js';
 
 validateEnv();
 
-import {globalLimiter} from './middleware/rate.limitter.js';
-import {errorHandler, notFoundHandler} from './middleware/errorHandler.middleware.js';
+import { globalLimiter } from './middleware/rate.limitter.js';
+import { errorHandler, notFoundHandler } from './middleware/errorHandler.middleware.js';
 import authRoutes from './routes/auth.routes.js';
-import {sequelize} from './models/index.js';
+import { sequelize } from './models/index.js';
 
 const app = express();
 
@@ -26,8 +26,8 @@ app.use(
 
 app.set('trust proxy', 1);
 
-app.use(express.json({limit: '10kb'}));
-app.use(express.urlencoded({extended: false, limit: '10kb'}));
+app.use(express.json({ limit: '10kb' }));
+app.use(express.urlencoded({ extended: false, limit: '10kb' }));
 app.use(cookieParser());
 
 app.use(globalLimiter);
@@ -44,13 +44,14 @@ const start = async () => {
         await sequelize.authenticate();
         console.log('[DB] Connection established.');
 
-
         if (process.env.NODE_ENV === 'development') {
-            await sequelize.sync({alter: true});
+            await sequelize.sync();
             console.log('[DB] Schema synced.');
         }
 
-        app.listen(PORT, () => console.log(`[Server] Running on port ${PORT}`));
+        app.listen(PORT, () => {
+            console.log(`[Server] Running on port ${PORT}`);
+        });
     } catch (err) {
         console.error('[Server] Failed to start:', err);
         process.exit(1);

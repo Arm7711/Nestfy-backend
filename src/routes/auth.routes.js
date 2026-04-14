@@ -22,9 +22,18 @@ router.post('/refresh',                                               ctrl.refre
 router.post('/logout',                                                ctrl.logout);
 router.post('/logout-all',   verifyToken,                            ctrl.logoutAll);
 
-router.get('/me',            verifyToken,                            ctrl.getMe);
+router.post('/verify-code',  authLimiter, validate(verifyCodeSchema),  ctrl.verifyCodeController);
 
-router.post('/google',       authLimiter,                            ctrl.googleAuth);
-router.post('/facebook',     authLimiter,                            ctrl.facebookAuth);
+
+router.post('/refresh',                                                 ctrl.refresh);
+router.post('/access-token',                           ctrl.getAccessTokenController);
+router.post('/logout',                                                  ctrl.logout);
+router.post('/logout-all',   verifyToken,                              ctrl.logoutAll);
+
+router.get('/me',            verifyToken,                              ctrl.getMe);
+
+
+router.post('/google',       authLimiter,                              ctrl.googleAuth);
+router.post('/apple',        authLimiter,                              ctrl.appleAuth);
 
 export default router;

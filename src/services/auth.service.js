@@ -69,20 +69,14 @@ export const verifyCodeForCookie = async ({ email, code, userAgent, ip }) => {
             TOO_MANY_ATTEMPTS: 'Too many failed attempts. Please request a new code.',
         };
         const STATUS = { INVALID_CODE: 400, CODE_EXPIRED: 400, TOO_MANY_ATTEMPTS: 429 };
-        const err = new AppError(
-            MESSAGES[result.error] ?? 'Verification failed.',
-            STATUS[result.error]   ?? 400,
-            result.error
-        );
-        if (result.remainingAttempts !== undefined) {
-            err.remainingAttempts = result.remainingAttempts;
-        }
+        const err = new AppError(MESSAGES[result.error] ?? 'Verification failed.', STATUS[result.error] ?? 400, result.error);
+        if (result.remainingAttempts !== undefined) err.remainingAttempts = result.remainingAttempts;
         throw err;
     }
 
     const user = await userRepo.findByEmail(normalized);
-    if (!user)          throw new AppError('User not found.',     404, 'USER_NOT_FOUND');
-    if (!user.isActive) throw new AppError('Account suspended.',  403, 'ACCOUNT_SUSPENDED');
+    if (!user) throw new AppError('User not found.', 404, 'USER_NOT_FOUND');
+    if (!user.isActive) throw new AppError('Account suspended.', 403, 'ACCOUNT_SUSPENDED');
 
     if (!user.emailVerifiedAt) {
         await user.update({ emailVerifiedAt: new Date() });
@@ -93,11 +87,20 @@ export const verifyCodeForCookie = async ({ email, code, userAgent, ip }) => {
 
     return {
         refreshToken: rawToken,
-        user: formatUser(user),
+        user: formatUser(user)
     };
 };
 
 export {refresh, logout, logoutAll} from './auth.service.refresh.js';
+
+export const refreshAccessToken = async (refreshToken, userAgent, ip) => {
+    if (!refreshToken) throw new AppError('No refresh token', 401);
+
+    const { accessToken, refreshToken: newRefreshToken, user } = await refresh({ refreshToken, userAgent, ip });
+
+    return { accessToken, refreshToken: newRefreshToken, user };
+};
+
 
 export const oauthLogin = async ({provider, providerId, email, name, userAgent, ip}) => {
     let oauthAccount = await OAuthAccount.findOne({
