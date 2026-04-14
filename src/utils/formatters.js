@@ -1,12 +1,3 @@
-export const formatUser = (user) => ({
-    id:              user.id,
-    name:            user.name,
-    email:           user.email,
-    role:            user.role,
-    avatar:          user.avatar,
-    emailVerifiedAt: user.emailVerifiedAt,
-});
-
 export const formatUserFull = (user) => {
     const profile = user.profile ?? null;
     const agent   = user.agent   ?? null;

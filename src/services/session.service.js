@@ -1,6 +1,7 @@
 import * as sessionRepo from '../repositories/session.repo.js';
 import { generateJti, hashToken } from '../utils/crypto.js';
 import { generateRefreshToken, REFRESH_TTL_SECONDS } from './token.service.js';
+import {userAgent} from "paypal-rest-sdk/lib/configure.js";
 
 export const createSession = async (userId, userAgent, ip) => {
     const jti = generateJti();
@@ -21,6 +22,7 @@ export const createSession = async (userId, userAgent, ip) => {
 export const claimSession = async (jti) => {
     return sessionRepo.claimByJti(jti);
 };
+
 
 export const rotateSession = async (oldSession, userAgent, ip) => {
     await sessionRepo.revokeByJti(oldSession.jti);
