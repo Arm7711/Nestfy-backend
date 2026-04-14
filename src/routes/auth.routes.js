@@ -34,6 +34,6 @@ router.get('/me',            verifyToken,                              ctrl.getM
 
 
 router.post('/google',       authLimiter,                              ctrl.googleAuth);
-router.post('/apple',        authLimiter,                              ctrl.appleAuth);
+// router.post('/apple',        authLimiter,                              ctrl.appleAuth);
 
 export default router;
