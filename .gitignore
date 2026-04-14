@@ -1,0 +1,53 @@
+# dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# env files
+.env
+.env.*
+!.env.example
+
+# logs
+logs/
+*.log
+
+# runtime
+dist/
+build/
+coverage/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# runtime caches
+.cache/
+.tmp/
+
+# certificates / secrets
+src/certificates/
+*.pem
+*.key
+*.crt
+
+# Sequelize / DB artifacts (если есть генерация)
+sequelize-debug.log
+
+# testing
+coverage/
+
+# uploads (если есть файлы пользователей)
+uploads/
+storage/
+
+# Docker (если не хочешь коммитить локальные данные)
+docker-compose.override.yml
+
+# optional lock cleanup (не обязательно)
+# yarn.lock
