@@ -11,36 +11,13 @@ Agent.init(
             primaryKey: true,
             autoIncrement: true,
         },
+
         userId: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.UUID,
             allowNull: false,
             unique: true,
-            references: {
-                model: 'users',
-                key: 'id',
-            },
+            references: { model: 'users', key: 'id' },
             onDelete: 'CASCADE',
-        },
-
-        phone: {
-            type: DataTypes.STRING(20),
-            allowNull: false,
-            validate: {
-                notEmpty: { msg: 'Phone number is required' },
-            },
-        },
-        bio: {
-            type: DataTypes.TEXT,
-            allowNull: true,
-        },
-        city: {
-            type: DataTypes.STRING,
-            allowNull: true,
-        },
-        experience: {
-            type: DataTypes.INTEGER,
-            allowNull: true,
-            defaultValue: 0,
         },
 
         licenseNumber: {
@@ -48,22 +25,25 @@ Agent.init(
             allowNull: true,
             unique: true,
         },
+
         licenseFile: {
-            type: DataTypes.STRING,
+            type: DataTypes.STRING(500),
             allowNull: true,
         },
+
         isVerified: {
             type: DataTypes.BOOLEAN,
             defaultValue: false,
         },
+
         status: {
             type: DataTypes.ENUM('pending', 'approved', 'rejected', 'suspended'),
             defaultValue: 'pending',
         },
+
         rejectionReason: {
             type: DataTypes.TEXT,
             allowNull: true,
-            defaultValue: null,
         },
 
 
@@ -71,25 +51,27 @@ Agent.init(
             type: DataTypes.ENUM('basic', 'pro', 'premium'),
             defaultValue: 'basic',
         },
+
         planExpiresAt: {
             type: DataTypes.DATE,
             allowNull: true,
-            defaultValue: null,
         },
+
         paypalSubscriptionId: {
             type: DataTypes.STRING,
             allowNull: true,
-            defaultValue: null,
         },
 
         totalListings: {
             type: DataTypes.INTEGER,
             defaultValue: 0,
         },
+
         totalViews: {
             type: DataTypes.INTEGER,
             defaultValue: 0,
         },
+
         rating: {
             type: DataTypes.FLOAT,
             defaultValue: 0.0,
@@ -98,30 +80,10 @@ Agent.init(
                 max: 5,
             },
         },
+
         reviewsCount: {
             type: DataTypes.INTEGER,
             defaultValue: 0,
-        },
-
-        facebook: {
-            type: DataTypes.STRING,
-            allowNull: true,
-            defaultValue: null,
-        },
-        instagram: {
-            type: DataTypes.STRING,
-            allowNull: true,
-            defaultValue: null,
-        },
-        telegram: {
-            type: DataTypes.STRING,
-            allowNull: true,
-            defaultValue: null,
-        },
-        website: {
-            type: DataTypes.STRING,
-            allowNull: true,
-            defaultValue: null,
         },
     },
     {
@@ -131,7 +93,6 @@ Agent.init(
         timestamps: true,
     }
 );
-
 
 Agent.belongsTo(User, { foreignKey: 'userId', as: 'user' });
 User.hasOne(Agent, { foreignKey: 'userId', as: 'agent' });

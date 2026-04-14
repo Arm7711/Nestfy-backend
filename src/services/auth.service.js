@@ -64,8 +64,8 @@ export const verifyCodeForCookie = async ({ email, code, userAgent, ip }) => {
 
     if (!result.success) {
         const MESSAGES = {
-            INVALID_CODE: 'Invalid or expired code.',
-            CODE_EXPIRED: 'This code has expired. Please request a new one.',
+            INVALID_CODE:      'Invalid or expired code.',
+            CODE_EXPIRED:      'This code has expired. Please request a new one.',
             TOO_MANY_ATTEMPTS: 'Too many failed attempts. Please request a new code.',
         };
         const STATUS = { INVALID_CODE: 400, CODE_EXPIRED: 400, TOO_MANY_ATTEMPTS: 429 };

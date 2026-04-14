@@ -82,6 +82,11 @@ User.init(
                     user.password = await bcrypt.hash(user.password, 12);
                 }
             },
+
+            afterCreate: async (user) => {
+                const { default: UserProfile } = await import('./UserProfiles.js');
+                await UserProfile.create({ userId: user.id });
+            },
         },
     }
 );
