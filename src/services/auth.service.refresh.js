@@ -51,17 +51,3 @@ export const refresh = async ({ refreshToken, userAgent, ip }) => {
         user:         formatUser(user),
     };
 };
-
-
-
-export const logout = async ({ refreshToken }) => {
-    if (!refreshToken) return;
-    try {
-        const decoded = verifyRefreshToken(refreshToken);
-        await sessionSvc.revokeSession(decoded.jti);
-    } catch { }
-};
-
-export const logoutAll = async ({ userId }) => {
-    await sessionSvc.revokeAllSessions(userId);
-};

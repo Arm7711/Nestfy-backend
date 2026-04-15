@@ -1,4 +1,5 @@
 import * as authSvc from '../services/auth.service.js';
+import * as rfsSvc from "../services/auth.service.refresh.js";
 import asyncHandler from '../utils/asyncHandler.js';
 import {verifyFacebookToken, verifyGoogleToken} from "../services/oauth.serivice.js";
 import {formatUserFull} from "../utils/formatters.js";
@@ -75,7 +76,7 @@ export const refresh = asyncHandler(async (req, res) => {
         });
     }
 
-    const { accessToken, refreshToken } = await authSvc.refresh({
+    const { accessToken, refreshToken } = await rfsSvc.refresh({
         refreshToken: token,
         userAgent:    req.headers['user-agent'],
         ip:           req.ip,

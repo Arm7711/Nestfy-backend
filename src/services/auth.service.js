@@ -12,60 +12,6 @@ const formatUser = (user) => ({
 });
 
 
-export const refresh = async ({ refreshToken, userAgent, ip }) => {
-    let decoded;
-    try {
-        decoded = verifyRefreshToken(refreshToken);
-    } catch {
-        throw new AppError('Invalid or expired refresh token.', 401, 'INVALID_TOKEN');
-    }
-
-    const { jti, sub: userId } = decoded;
-
-    const session = await sessionSvc.claimSession(jti);
-
-    if (!session) {
-        await sessionSvc.revokeAllSessions(userId);
-        throw new AppError('Token reuse detected. All sessions revoked.', 401, 'TOKEN_REUSE_DETECTED');
-    }
-
-    if (hashToken(refreshToken) !== session.refreshTokenHash) {
-        await sessionSvc.revokeAllSessions(userId);
-        throw new AppError('Token integrity check failed.', 401, 'TOKEN_MISMATCH');
-    }
-
-    if (new Date() > session.expiresAt) {
-        throw new AppError('Session expired.', 401, 'SESSION_EXPIRED');
-    }
-
-    const user = await userRepo.findById(userId);
-    if (!user || !user.isActive) {
-        await sessionSvc.revokeAllSessions(userId);
-        throw new AppError('Account not found or suspended.', 401, 'ACCOUNT_INVALID');
-    }
-
-    const { session: newSession, rawToken } = await sessionSvc.rotateSession(session, userAgent, ip);
-
-    return {
-        accessToken: generateAccessToken(user, newSession.id),
-        refreshToken: rawToken,
-        user: formatUser(user),
-    };
-};
-
-export const logout = async ({ refreshToken }) => {
-    if (!refreshToken) return;
-    try {
-        const decoded = verifyRefreshToken(refreshToken);
-        await sessionSvc.revokeSession(decoded.jti);
-    } catch { }
-};
-
-export const logoutAll = async ({ userId }) => {
-    await sessionSvc.revokeAllSessions(userId);
-};
-
-
 export const checkEmail = async (email) => {
     const normalized = email.toLowerCase().trim();
     const user = await userRepo.findByEmail(normalized);
@@ -179,4 +125,16 @@ export const oauthLogin = async ({ provider, providerId, email, name, userAgent,
         user: formatUser(user),
         isNewUser: !oauthAccount,
     };
+};
+
+export const logout = async ({ refreshToken }) => {
+    if (!refreshToken) return;
+    try {
+        const decoded = verifyRefreshToken(refreshToken);
+        await sessionSvc.revokeSession(decoded.jti);
+    } catch { }
+};
+
+export const logoutAll = async ({ userId }) => {
+    await sessionSvc.revokeAllSessions(userId);
 };
