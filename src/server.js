@@ -2,16 +2,14 @@ import express from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
-import 'dotenv/config';
-
-import {validateEnv} from './config/env.js';
-
-validateEnv();
-
 import {globalLimiter} from './middleware/rate.limitter.js';
 import {errorHandler, notFoundHandler} from './middleware/errorHandler.middleware.js';
 import authRoutes from './routes/auth.routes.js';
 import {sequelize} from './models/index.js';
+import {validateEnv} from './config/env.js';
+import 'dotenv/config';
+
+validateEnv();
 
 const app = express();
 

@@ -1,7 +1,8 @@
 import * as userRepo from '../repositories/user.repo.js';
 import * as sessionSvc from './session.service.js';
 import * as otpSvc from './otp.service.js'; 
-import { generateAccessToken } from './token.service.js';
+import { generateAccessToken, verifyRefreshToken } from './token.service.js';
+import { hashToken } from '../utils/crypto.js';
 import OAuthAccount from '../models/OAuthAccount.js'; 
 import AppError from '../utils/AppError.js';
 
@@ -9,6 +10,7 @@ const formatUser = (user) => ({
     id: user.id, name: user.name, email: user.email,
     role: user.role, avatar: user.avatar, emailVerifiedAt: user.emailVerifiedAt,
 });
+
 
 export const checkEmail = async (email) => {
     const normalized = email.toLowerCase().trim();
@@ -123,4 +125,16 @@ export const oauthLogin = async ({ provider, providerId, email, name, userAgent,
         user: formatUser(user),
         isNewUser: !oauthAccount,
     };
+};
+
+export const logout = async ({ refreshToken }) => {
+    if (!refreshToken) return;
+    try {
+        const decoded = verifyRefreshToken(refreshToken);
+        await sessionSvc.revokeSession(decoded.jti);
+    } catch { }
+};
+
+export const logoutAll = async ({ userId }) => {
+    await sessionSvc.revokeAllSessions(userId);
 };
