@@ -77,15 +77,19 @@ User.init(
                     user.password = await bcrypt.hash(user.password, 12);
                 }
             },
+
+            afterCreate: async (user) => {
+                const { default: UserProfile } = await import('./UserProfiles.js');
+                const { initializeSettings } = await import('../services/settings/profileSettings.service.js');
+
+                await UserProfile.create({ userId: user.id });
+                await initializeSettings(user.id, user.role);
+            },
+
             beforeUpdate: async (user) => {
                 if (user.changed('password') && user.password) {
                     user.password = await bcrypt.hash(user.password, 12);
                 }
-            },
-
-            afterCreate: async (user) => {
-                const { default: UserProfile } = await import('./UserProfiles.js');
-                await UserProfile.create({ userId: user.id });
             },
         },
     }

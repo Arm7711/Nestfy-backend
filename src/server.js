@@ -5,6 +5,7 @@ import cookieParser from 'cookie-parser';
 import {globalLimiter} from './middleware/rate.limitter.js';
 import {errorHandler, notFoundHandler} from './middleware/errorHandler.middleware.js';
 import authRoutes from './routes/auth.routes.js';
+import settingsRoutes from "./routes/settings/index.js";
 import {sequelize} from './models/index.js';
 import {validateEnv} from './config/env.js';
 import 'dotenv/config';
@@ -31,6 +32,8 @@ app.use(cookieParser());
 app.use(globalLimiter);
 
 app.use('/api/auth', authRoutes);
+app.use('/api/settings', settingsRoutes);
+
 
 app.use(notFoundHandler);
 app.use(errorHandler);
