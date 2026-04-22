@@ -1,21 +1,45 @@
 import Joi from 'joi';
 
-const profileSchema = Joi.object({
+export const profileSchema = Joi.object({
     fullName: Joi.string().min(2).max(100).optional(),
+    displayName: Joi.string().min(2).max(100).optional(),
+
     username: Joi.string()
-        .alphanum()
-        .min(3).max(50)
+        .min(3)
+        .max(50)
         .pattern(/^[a-zA-Z0-9_]+$/)
         .optional()
         .messages({
-            'string.pattern.base': 'Username can only contain letters, numbers, underscores.',
+            "string.pattern.base":
+                "Username can only contain letters, numbers, underscores.",
         }),
+
     phone: Joi.string()
         .pattern(/^\+?[\d\s\-()]{7,20}$/)
         .optional()
-        .messages({ 'string.pattern.base': 'Invalid phone format.' }),
-    bio:      Joi.string().max(500).optional().allow(''),
-    country:  Joi.string().max(100).optional(),
+        .messages({
+            "string.pattern.base": "Invalid phone format.",
+        }),
+
+    bio: Joi.string().max(500).optional().allow(""),
+
+    gender: Joi.string()
+        .valid("male", "female", "other", "prefer_not_to_say")
+        .optional(),
+
+    dateOfBirth: Joi.date().optional(),
+
+
+    avatar: Joi.string().uri().optional(),
+    coverPhoto: Joi.string().uri().optional(),
+
+    country: Joi.string().max(100).optional(),
+    city: Joi.string().max(100).optional(),
+    state: Joi.string().max(100).optional(),
+
+    lat: Joi.number().min(-90).max(90).optional(),
+    lng: Joi.number().min(-180).max(180).optional(),
+
     language: Joi.string().length(2).optional(),
     timezone: Joi.string().max(60).optional(),
 
