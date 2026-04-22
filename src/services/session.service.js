@@ -1,7 +1,8 @@
 import * as sessionRepo from '../repositories/session.repo.js';
 import { generateJti, hashToken } from '../utils/crypto.js';
 import { generateRefreshToken, REFRESH_TTL_SECONDS } from './token.service.js';
-import {userAgent} from "paypal-rest-sdk/lib/configure.js";
+import {Session} from "../models/index.js";
+import {Op} from "sequelize";
 
 export const createSession = async (userId, userAgent, ip) => {
     const jti = generateJti();
@@ -28,6 +29,21 @@ export const rotateSession = async (oldSession, userAgent, ip) => {
     await sessionRepo.revokeByJti(oldSession.jti);
     return createSession(oldSession.userId, userAgent, ip);
 };
+
+export const revokeAllExcept = (userId, currentJti) =>
+    Session.update(
+        {
+            isRevoked: true,
+            revokedAt: new Date(),
+        },
+        {
+            where: {
+                userId,
+                isRevoked: false,
+                jti: { [Op.ne]: currentJti },
+            },
+        }
+    );
 
 export const revokeSession = (jti) => sessionRepo.revokeByJti(jti);
 export const revokeAllSessions = (userId) => sessionRepo.revokeAllByUserId(userId);

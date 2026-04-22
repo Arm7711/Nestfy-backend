@@ -5,6 +5,7 @@ import { generateAccessToken, verifyRefreshToken } from './token.service.js';
 import { hashToken } from '../utils/crypto.js';
 import OAuthAccount from '../models/OAuthAccount.js'; 
 import AppError from '../utils/AppError.js';
+import {refresh} from "./auth.service.refresh.js";
 
 const formatUser = (user) => ({
     id: user.id, name: user.name, email: user.email,

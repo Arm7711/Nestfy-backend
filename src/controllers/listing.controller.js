@@ -6,7 +6,7 @@ import Agent from "../models/Agent.js";
 import User from "../models/User.js";
 import ListingImage from "../models/ListingImage.js";
 import Listing from "../models/Listings.js";
-import {createListingSchema} from "../validator/listing.validator.js";
+import {createListingSchema} from "../validators/listing.validator.js";
 
 
 export const getListings = async (req, res) => {

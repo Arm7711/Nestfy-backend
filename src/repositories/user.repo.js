@@ -1,7 +1,8 @@
 import User from '../models/User.js';
-import {UserProfile} from "../models/index.js";
 import Agent from "../models/Agent.js";
 import Agency from "../models/Agency.js";
+import UserProfile from "../models/settings/UserProfileSettings.js";
+
 
 export const findByEmail = (email) =>
     User.findOne({ where: { email: email.toLowerCase().trim() } });

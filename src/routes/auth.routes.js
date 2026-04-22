@@ -7,7 +7,7 @@ import {
     checkEmailSchema,
     initiateSchema,
     verifyCodeSchema,
-} from '../validator/auth.validator.js';
+} from '../validators/auth.validator.js';
 
 const router = Router();
 

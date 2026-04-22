@@ -1,11 +1,14 @@
-import PrivacySettings from "../../models/settings/PrivacySettings.js";
+import UserPrivacySettings from "../../models/settings/UserPrivacySettings.js";
 
+export const findByUserId = (userId) =>
+    UserPrivacySettings.findOne({ where: { userId } });
 
-export const findByProfileId = (profileSettingsId) =>
-    PrivacySettings.findOne({ where: { profileSettingsId } });
+export const create = (userId, data = {}) =>
+    UserPrivacySettings.create({ userId, ...data });
 
-export const create = (profileSettingsId, defaults = {}) =>
-    PrivacySettings.create({ profileSettingsId, ...defaults });
-
-export const update = (profileSettingsId, data) =>
-    PrivacySettings.update(data, { where: { profileSettingsId } });
+export const update = async (userId, data) => {
+    const settings = await findByUserId(userId);
+    if (!settings) return null;
+    await settings.update(data);
+    return settings;
+};
