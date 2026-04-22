@@ -5,7 +5,7 @@ import cookieParser from 'cookie-parser';
 import {globalLimiter} from './middleware/rate.limitter.js';
 import {errorHandler, notFoundHandler} from './middleware/errorHandler.middleware.js';
 import authRoutes from './routes/auth.routes.js';
-import settingsRoutes from "./routes/settings/index.js";
+import settingsRoutes from './routes/settings/settings.routes.js';
 import {sequelize} from './models/index.js';
 import {validateEnv} from './config/env.js';
 import 'dotenv/config';

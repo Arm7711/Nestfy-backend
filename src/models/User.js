@@ -79,11 +79,9 @@ User.init(
             },
 
             afterCreate: async (user) => {
-                const { default: UserProfile } = await import('./UserProfiles.js');
-                const { initializeSettings } = await import('../services/settings/profileSettings.service.js');
+                const { initializeUserSettings } = await import('../utils/settings.initializer.js');
 
-                await UserProfile.create({ userId: user.id });
-                await initializeSettings(user.id, user.role);
+                await initializeUserSettings(user.id, user.role);
             },
 
             beforeUpdate: async (user) => {

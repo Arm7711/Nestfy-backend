@@ -1,26 +1,14 @@
-import NotificationSettings     from '../../models/settings/NotificationSettings.js';
-import MarketplaceNotifications from '../../models/settings/MarketplaceNotifications.js';
+import UserNotificationSettings from "../../models/settings/NotificationSettings.js";
 
-export const findNotifByProfileId = (profileSettingsId) =>
-    NotificationSettings.findOne({ where: { profileSettingsId } });
+export const findByUserId = (userId) =>
+    UserNotificationSettings.findOne({ where: { userId } });
 
-export const createNotif = (profileSettingsId, defaults = {}) =>
-    NotificationSettings.create({ profileSettingsId, ...defaults });
+export const create = (userId, data = {}) =>
+    UserNotificationSettings.create({ userId, ...data });
 
-export const updateNotif = (profileSettingsId, data) =>
-    NotificationSettings.update(data, {
-        where:     { profileSettingsId },
-        returning: true,
-    });
-
-export const findMarketByProfileId = (profileSettingsId) =>
-    MarketplaceNotifications.findOne({ where: { profileSettingsId } });
-
-export const createMarket = (profileSettingsId, defaults = {}) =>
-    MarketplaceNotifications.create({ profileSettingsId, ...defaults });
-
-export const updateMarket = (profileSettingsId, data) =>
-    MarketplaceNotifications.update(data, {
-        where:     { profileSettingsId },
-        returning: true,
-    });
+export const update = async (userId, data) => {
+    const settings = await findByUserId(userId);
+    if(!settings) return null;
+    await settings.update(data);
+    return settings;
+};

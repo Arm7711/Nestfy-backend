@@ -33,14 +33,26 @@ export const checkEmail = asyncHandler(async (req, res) => {
 
 
 export const initiateLogin = asyncHandler(async (req, res) => {
-    const result = await authSvc.initiateLogin(req.body.email, req.ip);
-    res.json({ success: true, ...result });
+    try {
+        const result = await authSvc.initiateLogin(req.body.email, req.ip);
+        res.json({ success: true, ...result });
+    }catch(err) {
+        console.log(err)
+        next(err)
+    }
+
 });
 
 
-export const initiateRegister = asyncHandler(async (req, res) => {
-    const result = await authSvc.initiateRegister(req.body.email, req.ip);
-    res.status(201).json({ success: true, ...result });
+export const initiateRegister = asyncHandler(async (req, res,next) => {
+    try {
+        const result = await authSvc.initiateRegister(req.body.email, req.ip);
+        res.status(201).json({ success: true, ...result });
+    }catch(err) {
+        console.log(err)
+        next(err)
+    }
+
 });
 
 export const getAccessTokenController = asyncHandler(async (req, res) => {

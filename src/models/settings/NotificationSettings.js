@@ -1,53 +1,100 @@
-import {DataTypes, Model} from 'sequelize';
-import sequelize from "../../config/db.sequelize.js";
+import { DataTypes, Model } from 'sequelize';
+import sequelize from '../../config/db.sequelize.js';
+import User from '../User.js';
 
+class UserNotificationSettings extends Model {}
 
-class NotificationSettings extends Model {}
-
-NotificationSettings.init(
+UserNotificationSettings.init(
     {
         id: {
             type:          DataTypes.INTEGER,
             primaryKey:    true,
             autoIncrement: true,
         },
-
-        profileSettingsId: {
-            type:       DataTypes.INTEGER,
+        userId: {
+            type:       DataTypes.UUID,
             allowNull:  false,
             unique:     true,
-            references: { model: 'profile_settings', key: 'id' },
+            references: { model: 'users', key: 'id' },
             onDelete:   'CASCADE',
         },
 
+        //Channel Masters
         emailNotifications: {
-            type: DataTypes.BOOLEAN,
+            type:         DataTypes.BOOLEAN,
             defaultValue: true,
-            comment: 'Master switch; if false, all email notifications are blocked for this user.'
-
+            comment:      'Master email switch',
         },
-
-        pushNotifications: {
-            type: DataTypes.BOOLEAN,
-            defaultValue: true,
-            comment: "Browser/mobile push notifications"
-        },
-
         smsNotifications: {
-            type: DataTypes.BOOLEAN,
+            type:         DataTypes.BOOLEAN,
             defaultValue: false,
-            comment: "SMS — default false, premium feature"
-        }
+        },
+        pushNotifications: {
+            type:         DataTypes.BOOLEAN,
+            defaultValue: true,
+        },
+
+        // Platform Events
+        bookingAlerts: {
+            type:         DataTypes.BOOLEAN,
+            defaultValue: true,
+            comment:      'Booking confirmed/cancelled/updated',
+        },
+        messageAlerts: {
+            type:         DataTypes.BOOLEAN,
+            defaultValue: true,
+        },
+        reviewAlerts: {
+            type:         DataTypes.BOOLEAN,
+            defaultValue: true,
+        },
+        priceDropAlerts: {
+            type:         DataTypes.BOOLEAN,
+            defaultValue: true,
+        },
+        newListingAlerts: {
+            type:         DataTypes.BOOLEAN,
+            defaultValue: false,
+        },
+
+        // Marketing
+        marketingEmails: {
+            type:         DataTypes.BOOLEAN,
+            defaultValue: false,
+            comment:      'Promotional emails — GDPR opt-in',
+        },
+        weeklyDigest: {
+            type:         DataTypes.BOOLEAN,
+            defaultValue: false,
+        },
+        productUpdates: {
+            type:         DataTypes.BOOLEAN,
+            defaultValue: true,
+        },
+
+        // Security
+        securityAlerts: {
+            type:         DataTypes.BOOLEAN,
+            defaultValue: true,
+            comment:      'Cannot be disabled — always true enforced in service',
+        },
+        loginAlertNotif: {
+            type:         DataTypes.BOOLEAN,
+            defaultValue: true,
+        },
     },
     {
         sequelize,
-        modelName: 'NotificationSettings',
-        tableName: 'notification_settings',
+        modelName: 'UserNotificationSettings',
+        tableName: 'user_notification_settings',
         timestamps: true,
         indexes: [
-            { unique: true, fields: ['profileSettingsId'] },
+            { unique: true, fields: ['userId'] },
         ],
     }
-)
+);
 
-export default NotificationSettings;
+UserNotificationSettings.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+User.hasOne(UserNotificationSettings, { foreignKey: 'userId', as: 'notificationSettings' });
+
+export default UserNotificationSettings;

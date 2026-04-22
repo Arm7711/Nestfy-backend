@@ -1,6 +1,6 @@
 import Agent from "../models/Agent.js";
 import User from "../models/User.js";
-import {registerAgentSchema} from "../validator/agent.validator.js";
+import {registerAgentSchema} from "../validators/agent.validator.js";
 
 export const registerAgent = async (req, res) => {
     try {
