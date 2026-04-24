@@ -25,11 +25,6 @@ router.post('/logout-all',   verifyToken,                            ctrl.logout
 router.post('/verify-code',  authLimiter, validate(verifyCodeSchema),  ctrl.verifyCodeController);
 
 
-router.post('/refresh',                                                 ctrl.refresh);
-router.post('/access-token',                           ctrl.getAccessTokenController);
-router.post('/logout',                                                  ctrl.logout);
-router.post('/logout-all',   verifyToken,                              ctrl.logoutAll);
-
 router.get('/me',            verifyToken,                              ctrl.getMe);
 
 
