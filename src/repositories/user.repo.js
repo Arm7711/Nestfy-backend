@@ -29,7 +29,7 @@ export const findByWithProfile = (id) =>
                 as: 'profile',
                 required: false,
                 attributes: [
-                    'id', 'displayName', 'phone', 'bio',
+                    'id', 'preferredFirstName', 'phone', 'bio',
                     'country', 'city', 'state',
                     'phoneVerifiedAt', 'govIdVerifiedAt',
                     'specializations', 'yearsOfExperience', 'languages',
