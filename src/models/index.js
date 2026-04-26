@@ -7,18 +7,28 @@ import Agent from "./Agent.js";
 import Agency from "./Agency.js";
 import Listings from "./Listings.js";
 
-
 import UserSecuritySettings from "./settings/UserSecuritySettings.js";
 import NotificationSettings from "./settings/NotificationSettings.js";
 import UserPrivacySettings from "./settings/UserPrivacySettings.js";
 import UserPaymentSettings from "./settings/UserPaymentSettings.js";
 import UserNotificationSettings from "./settings/NotificationSettings.js";
 
+import KYCVerification from "./KYCVerification.js";
+import Comments from "./Comments.js";
+import ListingView from "./ListingView.js";
+import ListingImage from "./ListingImage.js";
+
+
 
 export {
     sequelize,
     User,
-
+    Agent,
+    Agency,
+    Session,
+    AuthCode,
+    OAuthAccount,
+    KYCVerification,
     //Settings
     UserSecuritySettings,
     NotificationSettings,
@@ -26,13 +36,11 @@ export {
     UserPaymentSettings,
     UserNotificationSettings,
 
-    Session,
-    AuthCode,
-    OAuthAccount,
-
+    Comments,
     Listings,
-    Agent,
-    Agency
+    ListingView,
+    ListingImage,
+
 };
 
 export default sequelize;

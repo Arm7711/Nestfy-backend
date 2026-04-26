@@ -2,82 +2,113 @@ import { DataTypes, Model } from 'sequelize';
 import sequelize from '../config/db.sequelize.js';
 import User from './User.js';
 
-class Agency extends Model {}
+class Agency extends Model {
+    getListingLimit() {
+        const LIMITS = { basic: 20, pro: 100, premium: Infinity };
+        return LIMITS[this.plan] ?? 20;
+    }
+}
 
 Agency.init(
     {
         id: {
-            type: DataTypes.INTEGER,
-            primaryKey: true,
+            type:          DataTypes.INTEGER,
+            primaryKey:    true,
             autoIncrement: true,
         },
         userId: {
-            type: DataTypes.UUID,
-            allowNull: false,
-            unique: true,
-            references: {
-                model: 'users',
-                key: 'id',
-            },
-            onDelete: 'CASCADE',
+            type:       DataTypes.UUID,
+            allowNull:  false,
+            unique:     true,
+            references: { model: 'users', key: 'id' },
+            onDelete:   'CASCADE',
+            comment:    'Agency owner/director userId',
         },
 
         name: {
-            type: DataTypes.STRING,
+            type:      DataTypes.STRING(200),
             allowNull: false,
         },
-
         bio: {
-            type: DataTypes.TEXT,
+            type:      DataTypes.TEXT,
             allowNull: true,
         },
-
         city: {
-            type: DataTypes.STRING,
+            type:      DataTypes.STRING(100),
             allowNull: true,
+        },
+        logo: {
+            type:      DataTypes.STRING(500),
+            allowNull: true,
+            comment:   'Cloudinary URL — agency logo',
         },
 
         licenseNumber: {
-            type: DataTypes.STRING,
+            type:      DataTypes.STRING,
             allowNull: true,
-            unique: true,
+            unique:    true,
         },
-
         licenseFile: {
-            type: DataTypes.STRING,
+            type:      DataTypes.STRING(500),
             allowNull: true,
         },
-
         isVerified: {
-            type: DataTypes.BOOLEAN,
+            type:         DataTypes.BOOLEAN,
             defaultValue: false,
         },
-
         status: {
-            type: DataTypes.ENUM('pending', 'approved', 'rejected', 'suspended'),
+            type:         DataTypes.ENUM('pending', 'approved', 'rejected', 'suspended'),
             defaultValue: 'pending',
         },
-
         rejectionReason: {
-            type: DataTypes.TEXT,
+            type:      DataTypes.TEXT,
             allowNull: true,
         },
 
-        totalListings: {
-            type: DataTypes.INTEGER,
-            defaultValue: 0,
+        // ── Subscription ──────────────────────────────────
+        /**
+         * Agency-ы el plan unim e — бaytс limits aveli mec en
+         * Agency plan-ы BOLOR agents-i listing-nery e cover-um
+         * или individual agent plans-ery el kan — business decision
+         */
+        plan: {
+            type:         DataTypes.ENUM('basic', 'pro', 'premium'),
+            defaultValue: 'basic',
+        },
+        planExpiresAt: {
+            type:      DataTypes.DATE,
+            allowNull: true,
+        },
+        paypalSubscriptionId: {
+            type:      DataTypes.STRING,
+            allowNull: true,
         },
 
-        totalViews: {
-            type: DataTypes.INTEGER,
+        // ── Stats ─────────────────────────────────────────
+        totalListings: {
+            type:         DataTypes.INTEGER,
             defaultValue: 0,
+        },
+        totalViews: {
+            type:         DataTypes.INTEGER,
+            defaultValue: 0,
+        },
+        agentCount: {
+            type:         DataTypes.INTEGER,
+            defaultValue: 0,
+            comment:      'Active agents count — auto-updated',
         },
     },
     {
         sequelize,
         modelName: 'Agency',
-        tableName: 'agencies',
+        tableName:  'agency',
         timestamps: true,
+        indexes: [
+            { unique: true, fields: ['userId'] },
+            { fields: ['status'] },
+            { fields: ['plan'] },
+        ],
     }
 );
 
