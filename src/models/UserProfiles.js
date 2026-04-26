@@ -1,6 +1,6 @@
 import { DataTypes, Model, Op } from 'sequelize';
-import sequelize from "../../config/db.sequelize.js";
-import User from '../User.js';
+import sequelize from "../config/db.sequelize.js";
+import User from './User.js';
 
 
 /**
@@ -31,7 +31,7 @@ class UserProfile extends Model {
     toPublicDTO() {
         return {
             id:                this.id,
-            displayName:       this.displayName,
+            preferredFirstName:       this.preferredFirstName,
             username:          this.username,
             bio:               this.bio,
             avatar:            this.avatar,
@@ -114,7 +114,7 @@ UserProfile.init(
         },
 
         //  1. Basic Personal Inf
-        displayName: {
+        preferredFirstName: {
             type:      DataTypes.STRING(100),
             allowNull: true,
             comment:   'Public display name — may differ from fullName',

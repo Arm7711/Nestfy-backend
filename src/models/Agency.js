@@ -65,12 +65,14 @@ Agency.init(
             allowNull: true,
         },
 
-        // ── Subscription ──────────────────────────────────
+        //Subscription
+
         /**
-         * Agency-ы el plan unim e — бaytс limits aveli mec en
-         * Agency plan-ы BOLOR agents-i listing-nery e cover-um
-         * или individual agent plans-ery el kan — business decision
+         * Agency-ն ունի իր սեփական plan-ը — սովորաբար limit-ները ավելի մեծ են
+         * Agency plan-ը կարող է cover անել բոլոր agents-ի listings-ը
+         * Կամ կարող են լինել նաև individual agent plans — business decision է
          */
+
         plan: {
             type:         DataTypes.ENUM('basic', 'pro', 'premium'),
             defaultValue: 'basic',
@@ -84,7 +86,7 @@ Agency.init(
             allowNull: true,
         },
 
-        // ── Stats ─────────────────────────────────────────
+        //Stats
         totalListings: {
             type:         DataTypes.INTEGER,
             defaultValue: 0,
