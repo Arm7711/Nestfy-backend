@@ -1,7 +1,7 @@
 import User from '../models/User.js';
 import Agent from "../models/Agent.js";
 import Agency from "../models/Agency.js";
-import UserProfile from "../models/settings/UserProfileSettings.js";
+import UserProfile from "../models/UserProfiles.js";
 
 
 export const findByEmail = (email) =>
