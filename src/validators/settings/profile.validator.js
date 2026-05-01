@@ -2,7 +2,7 @@ import Joi from 'joi';
 
 export const profileSchema = Joi.object({
     fullName: Joi.string().min(2).max(100).optional(),
-    displayName: Joi.string().min(2).max(100).optional(),
+    preferredFirstName: Joi.string().min(2).max(100).optional(),
 
     username: Joi.string()
         .min(3)

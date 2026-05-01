@@ -22,7 +22,7 @@ export const formatUserFull = (user) => {
 
 
         profile: profile ? {
-            displayName:       profile.displayName,
+            preferredFirstName:       profile.preferredFirstName,
             phone:             profile.phone,
             bio:               profile.bio,
             location: {

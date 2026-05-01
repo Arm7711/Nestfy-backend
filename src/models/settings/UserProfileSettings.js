@@ -1,6 +1,6 @@
 import { DataTypes, Model, Op } from 'sequelize';
-import sequelize from "../config/db.sequelize.js";
-import User from './User.js';
+import sequelize from "../../config/db.sequelize.js";
+import User from '../User.js';
 
 
 /**
@@ -16,8 +16,8 @@ import User from './User.js';
  * Model 2 — basic personal info, DTOs, language, timezone
  *
  * Conflict:
- * displayName (Model 1) vs fullName (Model 2) → both are kept
- * displayName = public-facing name (can differ from User.name)
+ * preferredFirstName (Model 1) vs fullName (Model 2) → both are kept
+ * preferredFirstName = public-facing name (can differ from User.name)
  * fullName    = real/legal name (e.g. passport-based)
  */
 class UserProfile extends Model {
