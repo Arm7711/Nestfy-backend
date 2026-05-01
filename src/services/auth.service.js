@@ -1,17 +1,11 @@
 import * as userRepo from '../repositories/user.repo.js';
 import * as sessionSvc from './session.service.js';
-import * as otpSvc from './otp.service.js'; 
+import * as otpSvc from './otp.service.js';
 import { generateAccessToken, verifyRefreshToken } from './token.service.js';
-import { hashToken } from '../utils/crypto.js';
-import OAuthAccount from '../models/OAuthAccount.js'; 
+import OAuthAccount from '../models/OAuthAccount.js';
 import AppError from '../utils/AppError.js';
-import {refresh} from "./auth.service.refresh.js";
-
-const formatUser = (user) => ({
-    id: user.id, name: user.name, email: user.email,
-    role: user.role, avatar: user.avatar, emailVerifiedAt: user.emailVerifiedAt,
-});
-
+import { refresh } from "./auth.service.refresh.js";
+import { formatUserFull } from '../utils/formatters.js';
 
 export const checkEmail = async (email) => {
     const normalized = email.toLowerCase().trim();
@@ -71,11 +65,13 @@ export const verifyCodeForCookie = async ({ email, code, userAgent, ip }) => {
         await user.reload();
     }
 
-    const { session, rawToken } = await sessionSvc.createSession(user.id, userAgent, ip);
+    const { rawToken } = await sessionSvc.createSession(user.id, userAgent, ip);
+
+    const userWithProfile = await userRepo.findByWithProfile(user.id);
 
     return {
         refreshToken: rawToken,
-        user: formatUser(user),
+        user: formatUserFull(userWithProfile),
     };
 };
 
@@ -98,10 +94,11 @@ export const oauthLogin = async ({ provider, providerId, email, name, userAgent,
         if (!user.isActive) throw new AppError('Account suspended.', 403, 'ACCOUNT_SUSPENDED');
 
         const { session, rawToken } = await sessionSvc.createSession(user.id, userAgent, ip);
+        const userWithProfile = await userRepo.findByWithProfile(user.id);
         return {
             accessToken: generateAccessToken(user, session.id),
             refreshToken: rawToken,
-            user: formatUser(user),
+            user: formatUserFull(userWithProfile),
             isNewUser: false,
         };
     }
@@ -120,10 +117,11 @@ export const oauthLogin = async ({ provider, providerId, email, name, userAgent,
     }
 
     const { session, rawToken } = await sessionSvc.createSession(user.id, userAgent, ip);
+    const userWithProfile = await userRepo.findByWithProfile(user.id);
     return {
         accessToken: generateAccessToken(user, session.id),
         refreshToken: rawToken,
-        user: formatUser(user),
+        user: formatUserFull(userWithProfile),
         isNewUser: !oauthAccount,
     };
 };

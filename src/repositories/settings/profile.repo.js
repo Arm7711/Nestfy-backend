@@ -1,4 +1,5 @@
 import UserProfileSettings from "../../models/settings/UserProfileSettings.js";
+import User from "../../models/User.js";
 
 /**
  * Repository layer — only DB queries
@@ -10,7 +11,7 @@ import UserProfileSettings from "../../models/settings/UserProfileSettings.js";
  */
 
 export const findByUserId = (userId) =>
-    UserProfileSettings.findOne({where: { userId } });
+    UserProfileSettings.findOne({ where: { userId } });
 
 export const findByUsername = (username) =>
     UserProfileSettings.findOne({ where: { username } });
@@ -28,11 +29,10 @@ export const create = (userId, data = {}) =>
 
 export const update = async (userId, data) => {
     const profile = await UserProfileSettings.findOne({ where: { userId } });
-    if(!profile) return null;
+    if (!profile) return null;
     await profile.update(data);
     return profile;
 };
 
-export const updateAvatar = (userId, avatarId) =>
-    UserProfileSettings.update({ avatar: avatarId, }, { where: { userId } });
-
+export const updateAvatar = (userId, avatarUrl) =>
+    User.update({ avatar: avatarUrl }, { where: { id: userId } });
