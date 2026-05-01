@@ -3,11 +3,8 @@ import UserPaymentSettings from "../../models/settings/UserPaymentSettings.js";
 export const findByUserId = (userId) =>
     UserPaymentSettings.findOne({ where: { userId } });
 
-export const create = (userId, data = {}) =>
-    UserPaymentSettings.create({
-        userId,
-        ...data
-    });
+export const create = (userId, data = {})=>
+    UserPaymentSettings.create(userId);
 
 export const update = async (userId, data) => {
     const settings = await findByUserId(userId);

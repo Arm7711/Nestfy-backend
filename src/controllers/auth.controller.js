@@ -33,14 +33,35 @@ export const checkEmail = asyncHandler(async (req, res) => {
 
 
 export const initiateLogin = asyncHandler(async (req, res) => {
+    try {
         const result = await authSvc.initiateLogin(req.body.email, req.ip);
         res.json({ success: true, ...result });
+    }catch(err) {
+        console.log(err)
+        next(err)
+    }
+
 });
 
 
 export const initiateRegister = asyncHandler(async (req, res,next) => {
-    const result = await authSvc.initiateRegister(req.body.email, req.ip);
-    res.status(201).json({ success: true, ...result });
+    try {
+        const result = await authSvc.initiateRegister(req.body.email, req.ip);
+        res.status(201).json({ success: true, ...result });
+    }catch(err) {
+        console.log(err)
+        next(err)
+    }
+
+});
+
+export const getAccessTokenController = asyncHandler(async (req, res) => {
+    const refreshToken = getRefreshCookie(req);
+    if (!refreshToken) return res.status(401).json({ success: false, message: 'No refresh token' });
+
+    const { accessToken } = await authSvc.refreshAccessToken(refreshToken, req.headers['user-agent'], req.ip);
+
+    res.json({ success: true, accessToken });
 });
 
 export const verifyCodeController = asyncHandler(async (req, res) => {
@@ -95,7 +116,6 @@ export const logoutAll = asyncHandler(async (req, res) => {
 export const getMe = asyncHandler(async (req, res) => {
     const user = await findByWithProfile(req.user.id);
 
-    console.log(user);
     if (!user) {
         return res.status(404).json({
             success: false,

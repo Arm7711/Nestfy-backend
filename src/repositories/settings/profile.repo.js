@@ -1,4 +1,4 @@
-import UserProfileSettings from "../../models/UserProfiles.js";
+import UserProfileSettings from "../../models/settings/UserProfileSettings.js";
 
 /**
  * Repository layer — only DB queries
