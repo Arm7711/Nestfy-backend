@@ -1,6 +1,6 @@
 import { DataTypes, Model } from 'sequelize';
 import sequelize from '../../config/db.sequelize.js';
-import User from '../User.js';
+import User from '../Auth/User.js';
 
 /**
  * UserSecuritySettings — security preferences

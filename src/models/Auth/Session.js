@@ -1,5 +1,5 @@
 import { DataTypes, Model } from 'sequelize';
-import sequelize from '../config/db.sequelize.js';
+import sequelize from '../../config/db.sequelize.js';
 
 class Session extends Model {}
 

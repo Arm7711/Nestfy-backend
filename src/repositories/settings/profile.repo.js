@@ -1,4 +1,5 @@
-import UserProfileSettings from "../../models/settings/UserProfileSettings.js";
+import UserProfileSettings from "../../models/Auth/UserProfiles.js";
+import User from "../../models/Auth/User.js";
 
 /**
  * Repository layer — only DB queries
@@ -33,6 +34,8 @@ export const update = async (userId, data) => {
     return profile;
 };
 
-export const updateAvatar = (userId, avatarId) =>
-    UserProfileSettings.update({ avatar: avatarId, }, { where: { userId } });
+export const updateAvatar = async (userId, avatarUrl) => {
+    await User.update({ avatar: avatarUrl }, { where: { id: userId } });
 
+    await UserProfileSettings.update({ avatar: avatarUrl }, { where: { userId } });
+};

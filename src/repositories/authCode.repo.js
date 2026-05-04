@@ -1,5 +1,5 @@
 import { Op } from 'sequelize';
-import AuthCode from '../models/AuthCode.js';
+import AuthCode from '../models/Auth/AuthCode.js';
 import sequelize from '../config/db.sequelize.js';
 
 export const create = (data) => AuthCode.create(data);

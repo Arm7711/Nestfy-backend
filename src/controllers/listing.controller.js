@@ -1,265 +1,103 @@
-import slugify from "slugify";
-import {Op} from "sequelize";
-import {clearListingsCache, getCache, setCache} from "../services/cache.service.js";
-import Listings from "../models/Listings.js";
-import Agent from "../models/Agent.js";
-import User from "../models/User.js";
-import ListingImage from "../models/ListingImage.js";
-import Listing from "../models/Listings.js";
-import {createListingSchema} from "../validators/listing.validator.js";
+import asyncHandler from "../utils/asyncHandler.js";
+import * as listingSvc      from '../services/listing.service.js';
+import * as listingImageSvc from '../services/listingImage.js';
+import * as listingViewSvc  from '../services/listingView.service.js';
 
+//Public gorcoxutyan maser
 
-export const getListings = async (req, res) => {
-    try {
-        const {
-            city,
-            type,
-            category,
-            minPrice,
-            maxPrice,
-            rooms,
-            page = 1,
-            limit = 12,
-            sort = 'createdAt',
-            order = 'DESC',
-        } = req.query;
+export const getListings = asyncHandler(async (req, res) => {
+    const data = await listingSvc.getListings(req.params.id);
+    res.json({ success: true, ...data });
+});
 
-        const cacheKey = `listings:${JSON.stringify(req.query)}`;
+export const getListingById = asyncHandler(async (req, res) => {
+    const listing = await listingSvc.getListingById(req.params.id);
 
-        const cached = await getCache(cacheKey);
-        if (cached) {
-            return res.json({success: true, fromCache: true, ...cached});
-        }
+    listingViewSvc.trackView({
+        listingId: listingSvc.getListingById(req.params.id),
+        userId: req.user?.id ?? null,
+        ipAddress: req.headers['user-agent'],
+    }).catch(() => {});
 
-        const where = {
-            status: 'active',
-        }
+    res.json({ success: true, listing });
+});
 
-        if (city) where.city = {[Op.like]: `%${city}%`};
-        if (type) where.type = type;
-        if (category) where.category = category;
-        if (rooms) where.rooms = parseInt(rooms);
+export const createListing = asyncHandler(async (req, res) => {
+    const listing = await listingSvc.createListing(req.user.id, req.body);
+    res.json(201).json({ success: true, listing });
+});
 
-        if (minPrice || maxPrice) {
-            where.price = {};
+export const updateListing = asyncHandler(async (req, res) => {
+    const listing = await listingSvc.updateListing(
+        req.params.id,
+        req.user.id,
+        req.body
+    );
 
-            if (minPrice) where.price[Op.gte] = parseInt(minPrice);
-            if (maxPrice) where.price[Op.lte] = parseInt(maxPrice);
-        }
+    res.json({ success: true, listing });
+});
 
-        const offset = (parseInt(page) - 1) * parseInt(limit);
+export const submitForReview = asyncHandler(async (req, res) => {
+    const listing = await listingSvc.submitForPreview(req.params.id, req.user.id);
 
-        const {count, rows: listings} = await Listings.findAndCountAll({
-            where,
-            limit: parseInt(limit),
-            offset,
-            order: [[sort, order]],
-            include: [
-                {
-                    model: Agent,
-                    as: 'agent',
-                    include: [
-                        {
-                            model: User,
-                            as: 'user',
-                            attributes: ['name', 'avatar'],
-                        },
-                    ],
-                },
-                {
-                    model: ListingImage,
-                    as: 'images',
-                    where: {isPrimary: true},
-                    required: false,
-                    limit: 1,
-                },
-            ],
-        })
+    res.json({ success: true, listing });
+});
 
-        const result = {
-            listings,
-            pagination: {
-                total: count,
-                page: parseInt(page),
-                limit: parseInt(limit),
-                totalPages: Math.ceil(count / parseInt(limit))
-            }
-        }
+export const archiveListing = asyncHandler(async (req, res) => {
+    const listing = await listingSvc.archiveListing(req.params.id, req.user.id);
 
-        await setCache(cacheKey, result, 600);
+    res.json({ success: true, listing });
+});
 
-        res.json({
-            success: true,
-            fromCache: false,
-            ...result,
-        })
-    } catch (error) {
-        res.status(500).json({success: false, message: 'Սերվերի սխալ', error: error.message});
-    }
-};
+export const deleteListing = asyncHandler(async (req, res) => {
+   await listingSvc.deleteListing(req.params.id, req.user.id);
 
-export const getListingById = async (req, res) => {
-    try {
-        const cacheKey = `listings:single:${req.params.id}`;
+   res.json({ success: true, message: 'Listing deleted.' });
+});
 
-        const cached = await getCache(cacheKey);
-        if (cached) {
-            return res.json({success: true, fromCache: true, listings: cached});
+//Admini masy
 
-        }
+export const approveListing = asyncHandler(async (req, res) => {
+    const listing = await listingSvc.approveListing(req.params.id, req.user.id);
 
-        const listing = await Listing.findOne({
-            where: {
-                id: req.params.id,
-                status: 'active',
-            },
-            include: [
-                {
-                    model: Agent,
-                    as: 'agent',
-                    include: [
-                        {
-                            model: User,
-                            as: 'user',
-                            attributes: ['name', 'avatar', 'email'],
-                        },
-                    ],
-                },
-                {
-                    model: ListingImage,
-                    as: 'images',
-                    separate: true,
-                    order: ['orderIndex', 'ASC'],
-                },
-            ],
-        });
+    res.json({ success: true, listing });
+});
 
-        if (!listing) {
-            return res.json({
-                success: false,
-                message: "Listing not found",
-            });
-        }
+export const rejectListing = asyncHandler(async (req, res) => {
+    const listing = await listingSvc.rejectListing(
+        req.params.id,
+        req.user.id,
+        req.body.reason
+    );
 
-        await listing.increment('views');
+    res.json({ success: true, listing });
+});
 
-        await setCache(cacheKey, listing, 900);
+//Nkarner
 
-        res.json({
-            success: true,
-            fromCache: true,
-            listing,
-        })
-    } catch (error) {
-        res.status(500).json({success: false, message: 'Սերվերի սխալ', error: error.message});
-    }
-};
+export const uploadImages = asyncHandler(async (req, res) => {
+    const images = await listingImageSvc.uploadListingImages(
+        req.params.id,
+        req.files,
+        req.user.id,
+    );
 
-export const createListing = async (req, res) => {
-    try {
-        const {error} = createListingSchema.validate(req.body, {
-            abortEarly: false,
-            allowUnknown: true,
-        })
+    res.status(201).json({ success: true, images });
+});
 
-        if (error) {
-            return res.status(400).json({
-                success: false,
-                message: error.details.map(d => d.message)
-            })
-        }
+export const deleteImage = asyncHandler(async (req, res) => {
+    await listingImageSvc.deleteImage(req.params.imageId, req.user.id);
 
-        const agent = await Agent.findOne({
-            where: { userId: req.user.id }
-        });
+    res.json({ success: true, message: 'Image recorded.' });
+});
 
-        if (!agent) {
-            return res.status(400).json({
-                success: false,
-                message: "You are not registered as an agent",
-            })
-        }
+//Kpoxe nkarneri hertakanutyuny
+export const recorderImages = asyncHandler(async (req, res) => {
+    await listingImageSvc.recorderImages(req.params.id, req.body.orderedIds);
+    res.json({ success: true, message: 'Images reordered.' });
+});
 
-        if (agent.status !== 'approved') {
-            return res.status(403).json({
-                success: false,
-                message: "Your agent account are not approved yet",
-            })
-        }
-
-        const PLAN_LIMITS = {basic: 5, pro: 20, premium: Infinity};
-        if (PLAN_LIMITS[agent.plan] !== Infinity && agent.totalListings >= PLAN_LIMITS[agent.plan]) {
-            return res.status(403).json({
-                success: false,
-                message: `Your ${agent.plan} plan allows ${PLAN_LIMITS[agent.plan]} listings`
-            });
-        }
-
-        const baseSlug = slugify(req.body.title, {
-            lower: true,
-            strict: true,
-        })
-
-        const uniqueSlug = `${baseSlug}-${Date.now()}`
-
-        const listing = await Listing.create({
-            ...req.body,
-            agentId: agent.id,
-            slug: uniqueSlug,
-            status: 'pending',
-        })
-
-        await agent.increment('totalListings');
-
-        await clearListingsCache();
-
-        res.status(201).json({
-            success: true,
-            message: "Listing created - awaiting admin approval"
-        })
-    } catch (error) {
-        res.status(500).json({success: false, message: 'Server Error', error: error.message});
-    }
-}
-
-//Admin — approve / reject / feature
-export const updateListingStatus = async (req, res) => {
-    try {
-        const { status, rejectionReason } = req.body;
-
-        const validStatuses = ['active', 'rejected', 'deleted'];
-
-        if(!validStatuses.includes(status)) {
-            return res.status(400).json({
-                success: false,
-                message: "invalid status",
-            })
-        }
-
-        const listing = await Listing.findByPk(req.params.id)
-        if (!listing) {
-            return res.status(404).json({
-                success: false,
-                message: "listing not found",
-            })
-        }
-
-        await listing.update({
-            status,
-            rejectionReason: status === "rejected" ? rejectionReason : null,
-        })
-
-        await clearListingsCache();
-
-        res.json({
-            success: true,
-            message: `Listing is ${status === 'active' ? 'approved' : 'rejected'}`,
-        })
-    } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: "Server Error",
-            error: error.message,
-        })
-    }
-}
+export const setPrimaryImage = asyncHandler(async (req, res) => {
+    await listingImageSvc.setPrimaryImage(req.params.imageId, req.params.id);
+    res.json({ success: true, message: 'Primary image updated.' });
+});

@@ -1,6 +1,6 @@
 import { DataTypes, Model } from 'sequelize';
-import sequelize from '../config/db.sequelize.js';
-import User from './User.js';
+import sequelize from '../../config/db.sequelize.js';
+import User from '../Auth/User.js';
 
 class Agent extends Model {
     /**
@@ -10,12 +10,7 @@ class Agent extends Model {
      */
 
     getListingLimit() {
-        const LIMITS = {
-            basic: 5,
-            pro: 20,
-            premium: Infinity,
-        };
-        return LIMITS[this.plan] ?? 5
+        return this.plan === 'premium' ? Infinity : 5;
     }
 
     /**
@@ -88,8 +83,8 @@ Agent.init(
         //Subscription Plan
 
         plan: {
-            type:         DataTypes.ENUM('basic', 'pro', 'premium'),
-            defaultValue: 'basic',
+            type:         DataTypes.ENUM('free', 'premium'),
+            defaultValue: 'free',
         },
         planExpiresAt: {
             type:      DataTypes.DATE,

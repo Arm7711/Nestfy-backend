@@ -1,6 +1,6 @@
 import { DataTypes, Model } from 'sequelize';
 import bcrypt from 'bcryptjs';
-import sequelize from '../config/db.sequelize.js';
+import sequelize from '../../config/db.sequelize.js';
 
 class User extends Model {
     async comparePassword(candidate) {
@@ -129,7 +129,7 @@ User.init(
             },
 
             afterCreate: async (user) => {
-                const { initializeUserSettings } = await import('../utils/settings.initializer.js');
+                const { initializeUserSettings } = await import('../../utils/settings.initializer.js');
 
                 await initializeUserSettings(user.id, user.role);
             },

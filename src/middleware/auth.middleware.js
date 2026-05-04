@@ -25,20 +25,3 @@ export const verifyToken = async (req, res, next) => {
         next(new AppError('Token invalid or expired.', 401, 'INVALID_TOKEN'));
     }
 };
-
-export const requireRole = (...roles) => (req, res, next) => {
-    if (!req.user) {
-        return next(new AppError('Unauthorized.', 401, 'UNAUTHORIZED'));
-    }
-    if (!roles.includes(req.user.role)) {
-        return next(new AppError('Insufficient permissions.', 403, 'FORBIDDEN'));
-    }
-    next();
-};
-
-export const requireVerifiedEmail = (req, res, next) => {
-    if (!req.user?.emailVerifiedAt) {
-        return next(new AppError('Email verification is required.', 403, 'EMAIL_NOT_VERIFIED'));
-    }
-    next();
-};

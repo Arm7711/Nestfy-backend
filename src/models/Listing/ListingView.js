@@ -1,7 +1,7 @@
 import {DataTypes, Model, Op} from "sequelize";
 import Listing from "./Listings.js";
-import sequelize from "../config/db.sequelize.js";
-import User from "./User.js";
+import sequelize from "../../config/db.sequelize.js";
+import User from "../Auth/User.js";
 
 
 /**

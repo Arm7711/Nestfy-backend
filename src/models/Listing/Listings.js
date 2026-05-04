@@ -1,8 +1,8 @@
 import { DataTypes, Model } from "sequelize";
-import sequelize from "../config/db.sequelize.js";
-import User from "./User.js";
-import Agent from "./Agent.js";
-import Agency from "./Agency.js";
+import sequelize from "../../config/db.sequelize.js";
+import User from "../Auth/User.js";
+import Agent from "../Agency/Agent.js";
+import Agency from "../Agency/Agency.js";
 
 /**
  * Listing — platform-ի core entity

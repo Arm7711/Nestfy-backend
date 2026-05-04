@@ -3,7 +3,7 @@ import * as sessionSvc from './session.service.js';
 import * as otpSvc from './otp.service.js'; 
 import { generateAccessToken, verifyRefreshToken } from './token.service.js';
 import { hashToken } from '../utils/crypto.js';
-import OAuthAccount from '../models/OAuthAccount.js'; 
+import OAuthAccount from '../models/Auth/OAuthAccount.js';
 import AppError from '../utils/AppError.js';
 import {refresh} from "./auth.service.refresh.js";
 
@@ -90,7 +90,7 @@ export const refreshAccessToken = async (refreshToken, userAgent, ip) => {
 export const oauthLogin = async ({ provider, providerId, email, name, userAgent, ip }) => {
     let oauthAccount = await OAuthAccount.findOne({
         where: { provider, providerId },
-        include: [{ model: (await import('../models/User.js')).default, as: 'user' }],
+        include: [{ model: (await import('../models/Auth/User.js')).default, as: 'user' }],
     });
 
     if (oauthAccount) {

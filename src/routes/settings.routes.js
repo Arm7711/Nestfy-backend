@@ -1,29 +1,30 @@
 import { Router }   from 'express';
-import * as profile  from '../../controllers/settings/profile.ctrl.js';
-import * as security from '../../controllers/settings/security.ctrl.js';
-import * as privacy  from '../../controllers/settings/privacy.ctrl.js';
-import * as notif    from '../../controllers/settings/notification.ctrl.js';
-import * as payment  from '../../controllers/settings/payment.ctrl.js';
+import * as profile  from '../controllers/settings/profile.ctrl.js';
+import * as security from '../controllers/settings/security.ctrl.js';
+import * as privacy  from '../controllers/settings/privacy.ctrl.js';
+import * as notif    from '../controllers/settings/notification.ctrl.js';
+import * as payment  from '../controllers/settings/payment.ctrl.js';
 
 import {
     settingsAuthGuard,
     sensitiveActionGuard,
-} from "../../middleware/settings.auth.middleware.js";
+} from "../middleware/settings.auth.middleware.js";
 
 import {
     settingsLimiter,
     passwordChangeLimiter,
     twoFactorLimiter,
-} from "../../middleware/settings.rate.limiter.js";
+} from "../middleware/settings.rate.limiter.js";
 
-import { validateProfile }            from '../../validators/settings/profile.validator.js';
+import { validateProfile }            from '../validators/settings/profile.validator.js';
 import {
     validateChangePassword,
     validateTwoFactor,
     validateSecuritySettings,
-}                                     from '../../validators/settings/security.validator.js';
+}                                     from '../validators/settings/security.validator.js';
 import { validateConnectPayPal, validatePaymentSettings }
-    from '../../validators/settings/payment.validator.js';
+    from '../validators/settings/payment.validator.js';
+import upload from "../middleware/upload.js";
 
 
 const router = Router();
@@ -34,7 +35,7 @@ router.use(settingsLimiter);
 //  Profile
 router.get ('/profile',         profile.getProfile);
 router.put ('/profile',         validateProfile,  profile.updateProfile);
-router.patch('/profile/avatar', profile.updateAvatar);
+router.patch('/profile/avatar', upload.single('avatar'), profile.updateAvatar);
 
 // Security
 router.get ('/security',                  security.getSecuritySettings);

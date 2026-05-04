@@ -1,5 +1,5 @@
 import { Op } from 'sequelize';
-import Session from '../models/Session.js';
+import Session from '../models/Auth/Session.js';
 
 export const create = (data) => Session.create(data);
 

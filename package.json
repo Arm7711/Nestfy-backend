@@ -22,7 +22,7 @@
   "dependencies": {
     "apple-signin-auth": "^2.0.0",
     "bcryptjs": "^3.0.3",
-    "cloudinary": "^2.9.0",
+    "cloudinary": "^2.10.0",
     "compression": "^1.8.1",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
@@ -50,6 +50,7 @@
     "sequelize": "^6.37.8",
     "sharp": "^0.34.5",
     "slugify": "^1.6.8",
+    "socket.io": "^4.8.3",
     "uuid": "^13.0.0",
     "winston": "^3.19.0"
   },
