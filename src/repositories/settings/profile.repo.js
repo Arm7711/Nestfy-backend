@@ -34,5 +34,8 @@ export const update = async (userId, data) => {
     return profile;
 };
 
-export const updateAvatar = (userId, avatarUrl) =>
-    User.update({ avatar: avatarUrl }, { where: { id: userId } });
+export const updateAvatar = async (userId, avatarUrl) => {
+    await User.update({ avatar: avatarUrl }, { where: { id: userId } });
+
+    await UserProfileSettings.update({ avatar: avatarUrl }, { where: { userId } });
+};
