@@ -1,7 +1,6 @@
 import { Router }    from 'express';
 import * as ctrl     from '../controllers/kyc.controller.js';
 import { verifyToken} from '../middleware/auth.middleware.js';
-import { kycUpload, handleMulterError } from '../config/multer.js';
 import rateLimit from 'express-rate-limit';
 import {requireRole} from "../middleware/role.middleware.js";
 
@@ -23,8 +22,6 @@ router.use(verifyToken);
 
 router.post('/submit',
     kycLimiter,
-    kycUpload,
-    handleMulterError,
     ctrl.submitKYC
 );
 

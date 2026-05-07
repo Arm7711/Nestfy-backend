@@ -22,7 +22,7 @@ const VALID_TAGS = [
     'guest_favorite', 'boosted', 'promoted',
 ];
 
-const listingSchema = Joi.object({
+export const listingSchema = Joi.object({
     title: Joi.string()
         .min(5).max(200)
         .required()

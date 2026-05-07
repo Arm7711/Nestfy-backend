@@ -1,9 +1,9 @@
 import {Op} from "sequelize";
-import logger from "../utils/logger.js";
-import { Listings, ListingImage, User, Agent, Agency, Favorite } from '../models/Common/index.js';
-import { get, set, getOrSet, CacheKey, TTL } from './redis.cervice.js';
+import logger from "../../utils/logger.js";
+import { Listings, ListingImage, User, Agent, Agency, Favorite } from '../../models/Common/index.js';
+import { get, set, getOrSet, CacheKey, TTL } from '../cache/redis.cervice.js';
 import { computeListingTags } from './ranking.service.js';
-import listings from "../models/Listing/Listings.js";
+import listings from "../../models/Listing/Listings.js";
 
 const LISTING_PER_SECTION = 8;
 

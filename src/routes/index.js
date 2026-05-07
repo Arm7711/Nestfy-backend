@@ -1,19 +1,26 @@
-import { Router }   from 'express';
-import authRoutes    from './auth.routes.js';
-// import listingRoutes from './listing.routes.js';
-// import commentRoutes from './comment.routes.js';
-import kycRoutes     from './kyc.routes.js';
-//import chatRoutes    from './chat.routes.js';
-import settingsRoutes from "./settings.routes.js";
-
+import { Router }    from 'express';
+import authRoutes     from './auth.routes.js';
+import listingRoutes  from './listing.routes.js';
+import commentRoutes  from './comment.routes.js';
+import kycRoutes      from './kyc.routes.js';
+import chatRoutes     from './chat.routes.js';
+import settingsRoutes from './settings.routes.js';
+import wishlistRoutes from './wishlist.router.js';
+import agentRoutes    from './agent.routes.js';
 
 const router = Router();
 
 router.use('/auth',      authRoutes);
-//router.use('/listings',  listingRoutes);
-//router.use('/listings/:listingId/comments', commentRoutes);
+router.use('/listings',  listingRoutes);
+router.use('/listings/:listingId/comments', commentRoutes);
+router.use('/wishlist',  wishlistRoutes);
 router.use('/kyc',       kycRoutes);
-//router.use('/chat',      chatRoutes);
+router.use('/chat',      chatRoutes);
 router.use('/settings',  settingsRoutes);
+router.use('/agents',    agentRoutes);
+
+router.get('/health', (req, res) =>
+    res.json({ success: true, timestamp: new Date().toISOString() })
+);
 
 export default router;

@@ -1,5 +1,5 @@
 import asyncHandler  from '../utils/asyncHandler.js';
-import * as commentSvc from '../services/comment.service.js';
+import * as commentSvc from '../services/comment/comment.service.js';
 
 
 export const createComment = asyncHandler(async (req, res) => {

@@ -1,4 +1,4 @@
-import { verifyAccessToken } from '../services/token.service.js';
+import { verifyAccessToken } from '../services/auth/token.service.js';
 import * as userRepo from '../repositories/user.repo.js';
 import AppError from '../utils/AppError.js';
 

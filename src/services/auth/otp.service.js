@@ -1,9 +1,9 @@
 import bcrypt from 'bcryptjs';
-import redis from '../config/redis.js';
-import * as authCodeRepo from '../repositories/authCode.repo.js';
-import { generateOtpCode } from '../utils/crypto.js';
+import redis from '../../config/redis.js';
+import * as authCodeRepo from '../../repositories/authCode.repo.js';
+import { generateOtpCode } from '../../utils/crypto.js';
 import { sendOtpEmail } from './email.service.js';
-import AppError from '../utils/AppError.js';
+import AppError from '../../utils/AppError.js';
 
 const OTP_EXPIRY_MINUTES    = 10;
 const MAX_ATTEMPTS          = 5;

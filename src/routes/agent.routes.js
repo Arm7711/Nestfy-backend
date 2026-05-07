@@ -6,7 +6,9 @@ import {
     approveAgent,
     rejectAgent,
 } from '../controllers/agent.controller.js';
-import { verifyToken, requireRole } from '../middleware/auth.middleware.js';
+import { verifyToken } from '../middleware/auth.middleware.js';
+import {requireRole} from "../middleware/role.middleware.js";
+
 
 const router = Router();
 

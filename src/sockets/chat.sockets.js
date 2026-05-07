@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import * as chatSvc from '../services/chat.service.js';
+import * as chatSvc from '../services/chat/chat.service.js';
 import logger from "../utils/logger.js";
 
 export const registerChatSocket = (io) => {

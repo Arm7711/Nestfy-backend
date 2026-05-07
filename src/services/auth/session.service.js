@@ -1,7 +1,7 @@
-import * as sessionRepo from '../repositories/session.repo.js';
-import { generateJti, hashToken } from '../utils/crypto.js';
+import * as sessionRepo from '../../repositories/session.repo.js';
+import { generateJti, hashToken } from '../../utils/crypto.js';
 import { generateRefreshToken, REFRESH_TTL_SECONDS } from './token.service.js';
-import {Session} from "../models/Common/index.js";
+import {Session} from "../../models/Common/index.js";
 import {Op} from "sequelize";
 
 export const createSession = async (userId, userAgent, ip) => {

@@ -1,6 +1,6 @@
 import * as paymentRepo from '../../repositories/settings/payment.repo.js';
-import AppError from "../../utils/AppError.js";
-import logger from "../../utils/logger.js";
+import AppError from '../../utils/AppError.js';
+import logger from '../../utils/logger.js';
 import {
     PaymentUpdateDTO,
     PayPalConnectDTO,
@@ -9,20 +9,20 @@ import {
 
 export const getPaymentSettings = async (userId) => {
     let settings = await paymentRepo.findByUserId(userId);
-    if(!settings) {
+    if (!settings) {
         settings = await paymentRepo.create(userId);
     }
-
     return settings.toSafeDTO();
 };
 
 export const connectPayPal = async (userId, rawData) => {
     const dto = PayPalConnectDTO(rawData);
 
-    const existing = await paymentRepo.findByPayPalEmail(dto.paymentEmail);
-    if(!existing) {
+    const existing = await paymentRepo.findByPayPalEmail(dto.paypalEmail);
+
+    if (existing && existing.userId !== userId) {
         throw new AppError(
-            'This PayPal account is already connect to another user',
+            'This PayPal account is already connected to another user.',
             409,
             'PAYPAL_ALREADY_CONNECTED'
         );
@@ -31,29 +31,26 @@ export const connectPayPal = async (userId, rawData) => {
     const updated = await paymentRepo.update(userId, {
         ...dto,
         paypalConnected: true,
-        paymentStatus: 'active',
-        connectedAt: new Date(),
-        disconnectedAt: new Date(),
+        paymentStatus:   'active',
+        connectedAt:     new Date(),
+        // BUG FIXED: was setting `disconnectedAt: new Date()` on connect — removed
     });
 
-    logger.info(`PayPal connected for user ${userId}: ${dto.paymentEmail}`);
+    logger.info(`PayPal connected for user ${userId}: ${dto.paypalEmail}`);
     return updated.toSafeDTO();
 };
 
 export const disconnectPayPal = async (userId) => {
-    const dto = PayPalDisconnectDTO();
+    const dto     = PayPalDisconnectDTO();
     const updated = await paymentRepo.update(userId, dto);
 
-    logger.info(`PayPak disconnected for user ${userId}`);;
+    logger.info(`PayPal disconnected for user ${userId}`);
     return updated.toSafeDTO();
 };
 
 export const updatePaymentSettings = async (userId, rawData) => {
-    const dto = PaymentUpdateDTO(rawData);
-
+    const dto     = PaymentUpdateDTO(rawData);
     const updated = await paymentRepo.update(userId, dto);
-    if(!updated) throw new AppError('Payment settings not found.', 404);
-
+    if (!updated) throw new AppError('Payment settings not found.', 404);
     return updated.toSafeDTO();
 };
-

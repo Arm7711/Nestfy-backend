@@ -1,7 +1,7 @@
 import {Op} from 'sequelize';
-import {Listings} from '../models/Common/index.js';
-import logger from '../utils/logger.js';
-import { del, invalidatePattern, CacheKey, TTL } from './redis.cervice.js';
+import {Listings} from '../../models/Common/index.js';
+import logger from '../../utils/logger.js';
+import { del, invalidatePattern, CacheKey, TTL } from '../cache/redis.cervice.js';
 
 
 const WEIGHTS = {

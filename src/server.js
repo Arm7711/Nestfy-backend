@@ -63,7 +63,7 @@ const start = async () => {
 
 
         if (process.env.NODE_ENV === 'development') {
-            //await sequelize.sync({ alter: true });
+            await sequelize.sync({ alter: true });
             console.log('[DB] Schema synced.');
         }
 

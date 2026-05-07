@@ -1,5 +1,5 @@
 import asyncHandler from '../utils/asyncHandler.js';
-import * as kycSvc  from '../services/kyc.service.js';
+import * as kycSvc  from '../services/auth/kyc.service.js';
 
 export const submitKYC = asyncHandler(async (req, res) => {
     const files = {

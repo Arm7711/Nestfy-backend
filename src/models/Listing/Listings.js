@@ -282,6 +282,22 @@ Listing.init(
             defaultValue: 0,
         },
 
+        tags: {
+            type:         DataTypes.JSON,
+            allowNull:    true,
+            defaultValue: ['organic'],
+            comment:      '["organic","trending","boosted","guest_favorite","superhost","promoted"]',
+        },
+        averageRating: {
+            type:         DataTypes.FLOAT,
+            defaultValue: 0.0,
+            validate:     { min: 0, max: 5 },
+        },
+        reviewsCount: {
+            type:         DataTypes.INTEGER,
+            defaultValue: 0,
+        },
+
         //Ranking
 
         /**

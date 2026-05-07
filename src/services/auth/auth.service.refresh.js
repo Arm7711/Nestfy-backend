@@ -1,8 +1,8 @@
-import * as userRepo   from '../repositories/user.repo.js';
+import * as userRepo   from '../../repositories/user.repo.js';
 import * as sessionSvc from './session.service.js';
 import { generateAccessToken, verifyRefreshToken } from './token.service.js';
-import { hashToken } from '../utils/crypto.js';
-import AppError from '../utils/AppError.js';
+import { hashToken } from '../../utils/crypto.js';
+import AppError from '../../utils/AppError.js';
 
 const formatUser = (user) => ({
     id: user.id, name: user.name, email: user.email,

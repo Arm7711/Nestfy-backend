@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { generateJti } from '../utils/crypto.js';
+import { generateJti } from '../../utils/crypto.js';
 
 const ACCESS_EXPIRES  = process.env.JWT_ACCESS_EXPIRES          || '15m';
 const REFRESH_EXPIRES = parseInt(process.env.JWT_REFRESH_EXPIRES_SECONDS, 10) || 604800;

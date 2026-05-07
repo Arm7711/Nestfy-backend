@@ -1,7 +1,7 @@
-import * as authSvc from '../services/auth.service.js';
-import * as rfsSvc from "../services/auth.service.refresh.js";
+import * as authSvc from '../services/auth/auth.service.js';
+import * as rfsSvc from "../services/auth/auth.service.refresh.js";
 import asyncHandler from '../utils/asyncHandler.js';
-import {verifyFacebookToken, verifyGoogleToken} from "../services/oauth.serivice.js";
+import {verifyFacebookToken, verifyGoogleToken} from "../services/auth/oauth.serivice.js";
 import {formatUserFull} from "../utils/formatters.js";
 import {findByWithProfile} from '../repositories/user.repo.js';
 const IS_PROD     = process.env.NODE_ENV === 'production';

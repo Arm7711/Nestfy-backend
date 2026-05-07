@@ -1,7 +1,7 @@
-import {KYCVerification, User} from "../models/Common/index.js";
-import AppError from "../utils/AppError.js";
-import logger from "../utils/logger.js";
-import {analyzeKYCWithAI} from "./ai/kycAi.service.js";
+import {KYCVerification, User} from "../../models/Common/index.js";
+import AppError from "../../utils/AppError.js";
+import logger from "../../utils/logger.js";
+import {analyzeKYCWithAI} from "../ai/kycAi.service.js";
 
 const ALLOWED_DOCUMENT_TYPES = ['passport', 'national_id', 'drivers_license'];
 

@@ -9,7 +9,8 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET,
     secure: true, // HTTPS ONlY
 });
-console.log('CLOUD NAME:', process.env.API_SECRET);
+
+
 cloudinary.api.ping()
     .then(() => logger.info('Successfully connected'))
     .catch(err => logger.error('❌ Cloudinary connection failed:', err.message));

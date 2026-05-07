@@ -1,5 +1,5 @@
 import { OAuth2Client } from "google-auth-library";
-import AppError from "../utils/AppError.js";
+import AppError from "../../utils/AppError.js";
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 

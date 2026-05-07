@@ -1,5 +1,5 @@
-import redis from "../config/redis.js";
-import logger from "../utils/logger.js";
+import redis from "../../config/redis.js";
+import logger from "../../utils/logger.js";
 
 //ttl CONSTANTS bolor cahcheeri jamketner
 
