@@ -71,6 +71,18 @@ export const profileSchema = Joi.object({
         .max(10)
         .optional(),
 
+    work: Joi.string()
+        .max(60)
+        .optional()
+        .allow(null, ''),
+
+    passion: Joi.string()
+        .max(60)
+        .optional()
+        .allow(null, '')
+        .messages({
+            'string.max': 'Keep your quirky fact under 60 characters!'
+        }),
 
     workingHours: Joi.object().pattern(
         Joi.string(),

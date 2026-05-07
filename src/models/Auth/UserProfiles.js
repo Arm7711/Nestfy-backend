@@ -77,6 +77,8 @@ class UserProfile extends Model {
             phone:       this.phone,
             gender:      this.gender,
             dateOfBirth: this.dateOfBirth,
+            work:       this.work,
+            languages:   this.languages,
             state:       this.state,
             timezone:    this.timezone,
             verified: {
@@ -164,11 +166,29 @@ UserProfile.init(
             allowNull:    true,
             defaultValue: null,
         },
+        work: {
+            type: DataTypes.STRING(60), // Sets DB column size to VARCHAR(60)
+            allowNull: true,
+            validate: {
+                len: {
+                    args: [0, 60],
+                    msg: "The 'work' field cannot exceed 60 characters."
+                }
+            },
+        },
+
+        passion: {
+            type: DataTypes.STRING(60),
+            allowNull: true,
+            validate: {
+                len: [0, 60]
+            }
+        },
+
         dateOfBirth: {
             type:      DataTypes.DATEONLY,
             allowNull: true,
         },
-
         // 2. Avatar & Cover
         avatar: {
             type:      DataTypes.STRING(500),

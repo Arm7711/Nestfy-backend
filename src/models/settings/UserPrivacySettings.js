@@ -41,6 +41,8 @@ UserPrivacySettings.init(
             defaultValue: true,
         },
 
+
+
         //Search & Indexing
         searchEngineIndexing: {
             type:         DataTypes.BOOLEAN,
